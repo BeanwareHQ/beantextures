@@ -23,6 +23,7 @@ class Beantxs_LinkItem(bpy.types.PropertyGroup):
 
 class Beantxs_ConfigEntry(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Config Name", description="Name of Beantextures configuration entry")
+    fallback_img: bpy.props.PointerProperty(type=bpy.types.Image, name="Fallback Image", description="Image to use when user-defined value does not match any link and therefore image (will output black if this is not set)")
     linking_type: bpy.props.EnumProperty(items=beantextures_link_type, name="Linking Type", description="Approach to link values to images")
     target_node_tree: bpy.props.PointerProperty(type=bpy.types.NodeTree, name="Target Node Tree", description="Node tree to be configured")
     output_alpha: bpy.props.BoolProperty(default=False, name="Output Alpha", description="Whether or not the generated node should output alpha of the active image")

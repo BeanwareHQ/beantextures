@@ -62,6 +62,11 @@ class ConfigsPanel(BeantexturesNodePanel):
             col.prop(item, "target_node_tree", text="Target Node")
             col.prop(item, "output_alpha", text="Output alpha")
 
+            if item.target_node_tree is not None and item.target_node_tree.is_beantextures:
+                col.operator("beantextures.generate_node_tree", text="Re-generate Node Tree", icon='FILE_REFRESH')
+            else:
+                col.operator("beantextures.generate_node_tree", icon='NODETREE')
+
         except IndexError:
             layout.column().label(text="No configuration available.")
 
@@ -101,6 +106,30 @@ class LinksPanel(BeantexturesNodePanel):
             col = row.column(align=True)
             col.operator("beantextures.new_link", icon='ADD', text="")
             col.operator("beantextures.remove_link", icon='REMOVE', text="")
+            col.separator()
+            col.operator("beantextures.clear_links", icon='X', text="")
+            col.operator("beantextures.auto_import_images", icon='FILE_FOLDER', text="")
+
+            layout.use_property_split = True
+            col = layout.column()
+            link_idx = active_config.active_link_idx
+            active_link = active_config.links[link_idx]
+
+            match active_config.linking_type:
+                case 'INT_SIMPLE':
+                    col.prop(active_link, "int_simple_val", text="Bind to")
+                case 'INT':
+                    col.prop(active_link, "int_gt", text="Greater Than")
+                    col.prop(active_link, "int_lt", text="Less Than")
+                case 'FLOAT':
+                    col.prop(active_link, "float_gt", text="Greater Than")
+                    col.prop(active_link, "float_lt", text="Less Than")
+                case 'ENUM':
+                        pass
+                case _:
+                    return
+                    
+            col.prop(active_link, "img", text="Image")
 
         except IndexError:
             return
