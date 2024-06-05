@@ -122,6 +122,29 @@ class BeantxsOp_RemoveSelectedConfig(Operator):
         remove_config(context, idx)
         return {'FINISHED'}
 
+class BeantxsOp_RemoveAllConfigs(Operator):
+    """Remove all configurations"""
+    bl_label = "Clear Configurations"
+    bl_idname = "beantextures.remove_all_configs"
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        settings = context.scene.beantextures_settings
+        settings.configs.clear()
+        return {'FINISHED'}
+
+    def draw(self, context):
+        layout = self.layout
+        layout.column().label(text="Delete all configurations?")
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        bpy.context.area.tag_redraw()
+        return wm.invoke_props_dialog(self)
+
 class BeantxsOp_NewLink(Operator):
     """Add a new link to the active configuration"""
     bl_label = "New Link"
@@ -228,6 +251,7 @@ def register():
     bpy.utils.register_class(BeantxsOp_NewLink) 
     bpy.utils.register_class(BeantxsOp_RemoveLink) 
     bpy.utils.register_class(BeantxsOp_RemoveSelectedConfig) 
+    bpy.utils.register_class(BeantxsOp_RemoveAllConfigs) 
     bpy.utils.register_class(BeantxsOp_AutoImportImages) 
     bpy.utils.register_class(BeantxsOp_ClearLinks) 
     bpy.utils.register_class(BeantxsOp_GenerateNode) 
@@ -238,6 +262,7 @@ def unregister():
     bpy.utils.unregister_class(BeantxsOp_NewLink) 
     bpy.utils.unregister_class(BeantxsOp_RemoveLink) 
     bpy.utils.unregister_class(BeantxsOp_RemoveSelectedConfig) 
+    bpy.utils.unregister_class(BeantxsOp_RemoveAllConfigs) 
     bpy.utils.unregister_class(BeantxsOp_AutoImportImages) 
     bpy.utils.unregister_class(BeantxsOp_ClearLinks) 
     bpy.utils.unregister_class(BeantxsOp_GenerateNode) 

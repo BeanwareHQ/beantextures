@@ -2,6 +2,93 @@
 import bpy
 from bpy.types import Panel, UIList
 
+# Helper functions
+
+def search_for_duplicate_int_simple_link_value(context, link) -> tuple[bool, str]:
+    """Check if link value had been used by other link(s). Returns `(True, <name>)` if duplicate is found, where `name` is the name of the first matched link. Otherwise, returns `(False, 0)`."""
+    settings = context.scene.beantextures_settings
+    config = settings.configs[settings.active_config_idx]
+    for check_link in config.links:
+        if check_link == link:
+            continue
+        if check_link.int_simple_val == link.int_simple_val:
+            return (True, check_link.name)
+    return (False, "")
+
+def search_for_duplicate_int_link_value(context, link) -> tuple[bool, str]:
+    """Check if link range value overlaps other link(s). Returns `(True, <name>)` if duplicate is found, where `name` is the name of the first matched link. Otherwise, returns `(False, 0)`."""
+    settings = context.scene.beantextures_settings
+    config = settings.configs[settings.active_config_idx]
+    for check_link in config.links:
+        if check_link == link:
+            continue
+        if link.int_gt >= check_link.int_gt and link.int_lt <= check_link.int_lt:
+            return (True, check_link.name)
+    return (False, "")
+
+def search_for_duplicate_float_link_value(context, link) -> tuple[bool, str]:
+    """Check if link range value overlaps other link(s). Returns `(True, <name>)` if duplicate is found, where `name` is the name of the first matched link. Otherwise, returns `(False, 0)`."""
+    settings = context.scene.beantextures_settings
+    config = settings.configs[settings.active_config_idx]
+    for check_link in config.links:
+        if check_link == link:
+            continue
+        if link.float_gt >= check_link.float_gt and link.float_lt <= check_link.float_lt:
+            return (True, check_link.name)
+    return (False, "")
+
+def search_for_duplicate_enum_name(context, link) -> bool:
+    """Check if another link with the same name already exists."""
+    settings = context.scene.beantextures_settings
+    config = settings.configs[settings.active_config_idx]
+    for check_link in config.links:
+        if check_link == link:
+            continue
+        if link.name == check_link.name:
+            return True
+    return False
+
+# Warning checkers
+
+def check_warnings_int_simple(context, link) -> list[str]:
+    warnings: list[str] = []
+    if (search_result := search_for_duplicate_int_simple_link_value(context, link))[0]:
+        warnings.append(f"Warning: index has been used by link '{search_result[1]}'.")
+    return warnings
+
+def check_warnings_int(context, link) -> list[str]:
+    warnings: list[str] = []
+    if (search_result := search_for_duplicate_int_link_value(context, link))[0]:
+        warnings.append(f"Warning: range overlaps with link '{search_result[1]}'.")
+
+    if link.int_lt - link.int_gt <= 1:
+        warnings.append(f"There's no integer greater than {link.int_gt} and less than {link.int_lt}!")
+
+    if link.int_lt < link.int_gt:
+        warnings.append("Range is invalid!")
+
+    return warnings
+
+def check_warnings_float(context, link) -> list[str]:
+    warnings: list[str] = []
+    if (search_result := search_for_duplicate_float_link_value(context, link))[0]:
+        warnings.append(f"Warning: range overlaps with link '{search_result[1]}'.")
+
+    if link.float_lt < link.float_gt:
+        warnings.append(f"Range is invalid!")
+
+    return warnings
+
+def check_warnings_enum(context, link) -> list[str]:
+    warnings: list[str] = []
+
+    if search_for_duplicate_enum_name(context, link):
+        warnings.append(f"Warning: link with similar name already exists.")
+
+    return warnings
+
+# Panel definitions
+
 class BeantexturesNodePanel(Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'UI'
@@ -52,6 +139,8 @@ class ConfigsPanel(BeantexturesNodePanel):
         col = row.column(align=True)
         col.operator("beantextures.new_config", icon='ADD', text="")
         col.operator("beantextures.remove_config", icon='REMOVE', text="")
+        col.separator()
+        col.operator("beantextures.remove_all_configs", icon='X', text="")
 
         try:
             idx = settings.active_config_idx
@@ -60,7 +149,8 @@ class ConfigsPanel(BeantexturesNodePanel):
             col = layout.column()
             col.prop(item, "linking_type", text="Linking Type")
             col.prop(item, "target_node_tree", text="Target Node")
-            col.prop(item, "output_alpha", text="Output alpha")
+            col.prop(item, "fallback_img", text="Fallback Image")
+            col.prop(item, "output_alpha", text="Output Alpha")
 
             if item.target_node_tree is not None and item.target_node_tree.is_beantextures:
                 col.operator("beantextures.generate_node_tree", text="Re-generate Node Tree", icon='FILE_REFRESH')
@@ -117,15 +207,37 @@ class LinksPanel(BeantexturesNodePanel):
 
             match active_config.linking_type:
                 case 'INT_SIMPLE':
+                    if (warnings := check_warnings_int_simple(context, active_link)):
+                        for msg in warnings:
+                            col.label(text=msg, icon='ERROR')
+                        col.separator()
+
                     col.prop(active_link, "int_simple_val", text="Bind to")
+
                 case 'INT':
+                    if (warnings := check_warnings_int(context, active_link)):
+                        for msg in warnings:
+                            col.label(text=msg, icon='ERROR')
+                        col.separator()
+
                     col.prop(active_link, "int_gt", text="Greater Than")
                     col.prop(active_link, "int_lt", text="Less Than")
+
                 case 'FLOAT':
+                    if (warnings := check_warnings_float(context, active_link)):
+                        for msg in warnings:
+                            col.label(text=msg, icon='ERROR')
+                        col.separator()
+
                     col.prop(active_link, "float_gt", text="Greater Than")
                     col.prop(active_link, "float_lt", text="Less Than")
+
                 case 'ENUM':
-                        pass
+                    if (warnings := check_warnings_enum(context, active_link)):
+                        for msg in warnings:
+                            col.label(text=msg, icon='ERROR')
+                        col.separator()
+
                 case _:
                     return
                     
