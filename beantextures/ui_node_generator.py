@@ -1,6 +1,7 @@
 """UI Interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
+from beantextures.props_settings import Beantxs_LinkItem, Beantxs_ConfigEntry
 
 # Helper functions
 
@@ -50,16 +51,20 @@ def search_for_duplicate_enum_name(context, link) -> bool:
 
 # Warning checkers
 
-def check_warnings_int_simple(context, link) -> list[str]:
+def check_warnings_int_simple(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
     if (search_result := search_for_duplicate_int_simple_link_value(context, link))[0]:
-        warnings.append(f"Warning: index has been used by link '{search_result[1]}'.")
+        warnings.append(f"Index has been used by link '{search_result[1]}'.")
+
+    if link.int_simple_val > config.int_max or link.int_simple_val < config.int_min:
+        warnings.append(f"Bound number is out of the set max/min range.")
+
     return warnings
 
-def check_warnings_int(context, link) -> list[str]:
+def check_warnings_int(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
     if (search_result := search_for_duplicate_int_link_value(context, link))[0]:
-        warnings.append(f"Warning: range overlaps with link '{search_result[1]}'.")
+        warnings.append(f"Range overlaps with link '{search_result[1]}'.")
 
     if link.int_lt - link.int_gt <= 1:
         warnings.append(f"There's no integer greater than {link.int_gt} and less than {link.int_lt}!")
@@ -67,23 +72,29 @@ def check_warnings_int(context, link) -> list[str]:
     if link.int_lt < link.int_gt:
         warnings.append("Range is invalid!")
 
+    if link.int_gt > config.int_max or link.int_lt < config.int_min:
+        warnings.append("Range is out of the set max/min range.")
+
     return warnings
 
-def check_warnings_float(context, link) -> list[str]:
+def check_warnings_float(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
     if (search_result := search_for_duplicate_float_link_value(context, link))[0]:
-        warnings.append(f"Warning: range overlaps with link '{search_result[1]}'.")
+        warnings.append(f"Range overlaps with link '{search_result[1]}'.")
 
     if link.float_lt < link.float_gt:
-        warnings.append(f"Range is invalid!")
+        warnings.append("Range is invalid!")
+
+    if link.float_gt > config.float_max or link.float_lt < config.float_min:
+        warnings.append("Range is out of the set max/min range.")
 
     return warnings
 
-def check_warnings_enum(context, link) -> list[str]:
+def check_warnings_enum(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
 
     if search_for_duplicate_enum_name(context, link):
-        warnings.append(f"Warning: link with similar name already exists.")
+        warnings.append("Link with similar name already exists.")
 
     return warnings
 
@@ -152,10 +163,27 @@ class ConfigsPanel(BeantexturesNodePanel):
             col.prop(item, "fallback_img", text="Fallback Image")
             col.prop(item, "output_alpha", text="Output Alpha")
 
+            match item.linking_type:
+                case 'INT_SIMPLE':
+                    range_col = col.row()
+                    range_col.prop(item, "int_min", text="Min")
+                    range_col.prop(item, "int_max", text="Max")
+                case 'INT':
+                    range_col = col.row()
+                    range_col.prop(item, "int_min", text="Min")
+                    range_col.prop(item, "int_max", text="Max")
+                case 'FLOAT': 
+                    range_col = col.row()
+                    range_col.prop(item, "float_min", text="Min")
+                    range_col.prop(item, "float_max", text="Max")
+                case 'ENUM':
+                    pass
+
+            col.separator()
             if item.target_node_tree is not None and item.target_node_tree.is_beantextures:
                 col.operator("beantextures.generate_node_tree", text="Re-generate Node Tree", icon='FILE_REFRESH')
             else:
-                col.operator("beantextures.generate_node_tree", icon='NODETREE')
+                col.operator("beantextures.generate_node_tree", text="Generate Node Tree", icon='NODETREE')
 
         except IndexError:
             layout.column().label(text="No configuration available.")
@@ -207,35 +235,35 @@ class LinksPanel(BeantexturesNodePanel):
 
             match active_config.linking_type:
                 case 'INT_SIMPLE':
-                    if (warnings := check_warnings_int_simple(context, active_link)):
+                    if (warnings := check_warnings_int_simple(context, active_link, active_config)):
                         for msg in warnings:
-                            col.label(text=msg, icon='ERROR')
+                            col.label(text="Warning: " + msg, icon='ERROR')
                         col.separator()
 
                     col.prop(active_link, "int_simple_val", text="Bind to")
 
                 case 'INT':
-                    if (warnings := check_warnings_int(context, active_link)):
+                    if (warnings := check_warnings_int(context, active_link, active_config)):
                         for msg in warnings:
-                            col.label(text=msg, icon='ERROR')
+                            col.label(text="Warning: " + msg, icon='ERROR')
                         col.separator()
 
                     col.prop(active_link, "int_gt", text="Greater Than")
                     col.prop(active_link, "int_lt", text="Less Than")
 
                 case 'FLOAT':
-                    if (warnings := check_warnings_float(context, active_link)):
+                    if (warnings := check_warnings_float(context, active_link, active_config)):
                         for msg in warnings:
-                            col.label(text=msg, icon='ERROR')
+                            col.label(text="Warning: " + msg, icon='ERROR')
                         col.separator()
 
                     col.prop(active_link, "float_gt", text="Greater Than")
                     col.prop(active_link, "float_lt", text="Less Than")
 
                 case 'ENUM':
-                    if (warnings := check_warnings_enum(context, active_link)):
+                    if (warnings := check_warnings_enum(context, active_link, active_config)):
                         for msg in warnings:
-                            col.label(text=msg, icon='ERROR')
+                            col.label(text="Warning: " + msg, icon='ERROR')
                         col.separator()
 
                 case _:

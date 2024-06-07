@@ -17,9 +17,10 @@ if "bpy" in locals():
     reload(props_nodes)
     reload(props_settings)
     reload(ui_node_generator)
+    reload(ops_generation)
 
 else:
-    from . import ops_settings, props_nodes, props_settings, ui_node_generator
+    from . import ops_settings, props_nodes, props_settings, ui_node_generator, ops_generation
 
 
 def register():
@@ -27,12 +28,15 @@ def register():
     props_nodes.register()
     props_settings.register()
     ui_node_generator.register()
+    ops_generation.register()
 
 def unregister():
     ops_settings.unregister()
     props_nodes.unregister()
     props_settings.unregister()
     ui_node_generator.unregister()
+    ops_generation.unregister()
+
 
 if __name__ == "__main__":
     register()

@@ -176,7 +176,7 @@ class BeantxsOp_RemoveLink(Operator):
         return {'FINISHED'}
 
 class BeantxsOp_AutoImportImages(Operator):
-    """Automatically import image(s) as relation(s)"""
+    """Automatically import image(s) as link(s)"""
     bl_label = "Import Image(s)"
     bl_idname = "beantextures.auto_import_images"
 
@@ -231,25 +231,6 @@ class BeantxsOp_ClearLinks(Operator):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
-class BeantxsOp_GenerateNode(Operator):
-    """Generate node tree using active configuration"""
-    bl_label = "Generate Node Tree"
-    bl_idname = "beantextures.generate_node_tree"
-
-    @classmethod
-    def poll(cls, context):
-        settings = context.scene.beantextures_settings
-        config = settings.configs[settings.active_config_idx]
-
-        if not isinstance(config.target_node_tree, bpy.types.ShaderNodeTree):
-            cls.poll_message_set("Specify a shader node group as the target!")
-        if not bool(config.target_node_tree):
-            cls.poll_message_set("Set a valid shader node group as a target first!")
-        return bool(config.target_node_tree) and isinstance(config.target_node_tree, bpy.types.ShaderNodeTree)
-
-    def execute(self, context):
-        return {'FINISHED'}
-
 def register():
     bpy.utils.register_class(BeantxsOp_NewNodeGroup) 
     bpy.utils.register_class(BeantxsOp_NewConfig) 
@@ -259,7 +240,6 @@ def register():
     bpy.utils.register_class(BeantxsOp_RemoveAllConfigs) 
     bpy.utils.register_class(BeantxsOp_AutoImportImages) 
     bpy.utils.register_class(BeantxsOp_ClearLinks) 
-    bpy.utils.register_class(BeantxsOp_GenerateNode) 
 
 def unregister():
     bpy.utils.unregister_class(BeantxsOp_NewNodeGroup)
@@ -270,4 +250,3 @@ def unregister():
     bpy.utils.unregister_class(BeantxsOp_RemoveAllConfigs) 
     bpy.utils.unregister_class(BeantxsOp_AutoImportImages) 
     bpy.utils.unregister_class(BeantxsOp_ClearLinks) 
-    bpy.utils.unregister_class(BeantxsOp_GenerateNode) 
