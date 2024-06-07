@@ -124,7 +124,7 @@ def generate_int_simple_node_group(context, config: Beantxs_ConfigEntry):
     maths_reroute_node.location = (maths_reroute_node.location[0], (prev_mix_inputs_loc[1] - 360) // 2)
     group_in.location = (group_in.location[0], (prev_mix_inputs_loc[1] - 290) // 2)
 
-    group_in.outputs['Value'].default_value = config.int_min
+    node.interface.items_tree['Value'].default_value = config.int_min
 
 def generate_int_node_group(context, config: Beantxs_ConfigEntry):
     links: list[Beantxs_LinkItem] = config.links # wrong type but it works and I need autocompletion
@@ -247,7 +247,7 @@ def generate_int_node_group(context, config: Beantxs_ConfigEntry):
     maths_reroute_node.location = (maths_reroute_node.location[0], (prev_mix_inputs_loc[1] - 360) // 2)
     group_in.location = (group_in.location[0], (prev_mix_inputs_loc[1] - 290) // 2)
 
-    group_in.outputs['Value'].default_value = config.int_min
+    node.interface.items_tree['Value'].default_value = config.int_min
 
 def generate_float_node_group(context, config: Beantxs_ConfigEntry):
     links: list[Beantxs_LinkItem] = config.links # wrong type but it works and I need autocompletion
@@ -369,7 +369,7 @@ def generate_float_node_group(context, config: Beantxs_ConfigEntry):
 
     maths_reroute_node.location = (maths_reroute_node.location[0], (prev_mix_inputs_loc[1] - 360) // 2)
     group_in.location = (group_in.location[0], (prev_mix_inputs_loc[1] - 290) // 2)
-    group_in.outputs['Value'].default_value = config.float_min
+    node.interface.items_tree['Value'].default_value = config.float_min
 
 def generate_enum_node_group(context, config: Beantxs_ConfigEntry):
     links: list[Beantxs_LinkItem] = config.links # wrong type but it works and I need autocompletion
@@ -500,7 +500,7 @@ def generate_enum_node_group(context, config: Beantxs_ConfigEntry):
     maths_reroute_node.location = (maths_reroute_node.location[0], (prev_mix_inputs_loc[1] - 360) // 2)
     group_in.location = (group_in.location[0], (prev_mix_inputs_loc[1] - 290) // 2)
 
-    group_in.outputs['Value'].default_value = 0
+    node.interface.items_tree['Value'].default_value = 0
 
 # Testing
 #generate_int_simple_node_group(bpy.context, bpy.context.scene.beantextures_settings.configs[0])

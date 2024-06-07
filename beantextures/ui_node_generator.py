@@ -72,7 +72,7 @@ def check_warnings_int(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEn
     if link.int_lt < link.int_gt:
         warnings.append("Range is invalid!")
 
-    if link.int_gt > config.int_max or link.int_lt < config.int_min:
+    if link.int_lt > config.int_max + 1 or link.int_gt < config.int_min - 1:
         warnings.append("Range is out of the set max/min range.")
 
     return warnings
@@ -85,7 +85,7 @@ def check_warnings_float(context, link: Beantxs_LinkItem, config: Beantxs_Config
     if link.float_lt < link.float_gt:
         warnings.append("Range is invalid!")
 
-    if link.float_gt > config.float_max or link.float_lt < config.float_min:
+    if link.float_lt > config.float_max or link.float_gt < config.float_min:
         warnings.append("Range is out of the set max/min range.")
 
     return warnings
