@@ -100,13 +100,13 @@ class BeantexturesNodePanel(Panel):
 
 class NodeTreePanel(BeantexturesNodePanel):
     bl_idname = "BEANTEXTURES_PT_node_tree_adder"
-    bl_label = "Node Tree"
+    bl_label = "Node Group"
 
     def draw(self, context):
         layout = self.layout
         layout.use_property_split = True
-        layout.row().prop(bpy.context.scene.beantextures_settings, "node_tree_adder_name")
-        layout.row().operator("beantextures.new_node_tree", text="Add", icon='PLUS')
+        layout.row().prop(bpy.context.scene.beantextures_settings, "node_group_adder_name")
+        layout.row().operator("beantextures.new_node_group", text="Add", icon='PLUS')
 
 class BEANTEXTURES_UL_ConfigsListRenderer(UIList):
     """
@@ -148,7 +148,7 @@ class ConfigsPanel(BeantexturesNodePanel):
 
             col = layout.column()
             col.prop(item, "linking_type", text="Linking Type")
-            col.prop(item, "target_node_tree", text="Target Node")
+            col.prop(item, "target_node_tree", text="Target Node Group")
             col.prop(item, "fallback_img", text="Fallback Image")
             col.prop(item, "output_alpha", text="Output Alpha")
 

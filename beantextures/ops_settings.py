@@ -78,10 +78,10 @@ def delete_all_links(context, config: Beantxs_ConfigEntry, purge_images: bool):
 
 # Operator Classes
 
-class BeantxsOp_NewNodeTree(Operator):
-    """Add a new shader node tree"""
-    bl_label = "Add New Node Tree"
-    bl_idname = "beantextures.new_node_tree"
+class BeantxsOp_NewNodeGroup(Operator):
+    """Add a new shader node group"""
+    bl_label = "Add New Node Group"
+    bl_idname = "beantextures.new_node_group"
 
     @classmethod
     def poll(cls, context):
@@ -89,10 +89,10 @@ class BeantxsOp_NewNodeTree(Operator):
 
     def execute(self, context):
         # too short so no wrapper function.
-        name = context.scene.beantextures_settings.node_tree_adder_name
+        name = context.scene.beantextures_settings.node_group_adder_name
         obj = bpy.data.node_groups.new(name, 'ShaderNodeTree')
         # obj.name is used to get the real unique name (`name` may already exist)
-        self.report({'INFO'}, f"Added node tree '{obj.name}'")
+        self.report({'INFO'}, f"Added node group '{obj.name}'")
         return {'FINISHED'}
 
 class BeantxsOp_NewConfig(Operator):
@@ -240,13 +240,18 @@ class BeantxsOp_GenerateNode(Operator):
     def poll(cls, context):
         settings = context.scene.beantextures_settings
         config = settings.configs[settings.active_config_idx]
-        return bool(config.target_node_tree)
+
+        if not isinstance(config.target_node_tree, bpy.types.ShaderNodeTree):
+            cls.poll_message_set("Specify a shader node group as the target!")
+        if not bool(config.target_node_tree):
+            cls.poll_message_set("Set a valid shader node group as a target first!")
+        return bool(config.target_node_tree) and isinstance(config.target_node_tree, bpy.types.ShaderNodeTree)
 
     def execute(self, context):
         return {'FINISHED'}
 
 def register():
-    bpy.utils.register_class(BeantxsOp_NewNodeTree) 
+    bpy.utils.register_class(BeantxsOp_NewNodeGroup) 
     bpy.utils.register_class(BeantxsOp_NewConfig) 
     bpy.utils.register_class(BeantxsOp_NewLink) 
     bpy.utils.register_class(BeantxsOp_RemoveLink) 
@@ -257,7 +262,7 @@ def register():
     bpy.utils.register_class(BeantxsOp_GenerateNode) 
 
 def unregister():
-    bpy.utils.unregister_class(BeantxsOp_NewNodeTree)
+    bpy.utils.unregister_class(BeantxsOp_NewNodeGroup)
     bpy.utils.unregister_class(BeantxsOp_NewConfig) 
     bpy.utils.unregister_class(BeantxsOp_NewLink) 
     bpy.utils.unregister_class(BeantxsOp_RemoveLink) 

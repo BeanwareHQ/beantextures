@@ -30,8 +30,14 @@ class Beantxs_ConfigEntry(bpy.types.PropertyGroup):
     active_link_idx: bpy.props.IntProperty(name="Index of Active Link")
     links: bpy.props.CollectionProperty(type=Beantxs_LinkItem, name="Configured Links", description="Collection of defined value-image links")
 
+    int_max: bpy.props.IntProperty(name="Maximum Int Value")
+    int_min: bpy.props.IntProperty(name="Maximum Int Value")
+
+    float_max: bpy.props.FloatProperty(name="Maximum Float Value")
+    float_min: bpy.props.FloatProperty(name="Minimum Float Value")
+
 class Beantxs_GlobalSettings(bpy.types.PropertyGroup):
-    node_tree_adder_name: bpy.props.StringProperty(name="Node Tree Name", description="Name to assign for the new node tree", default="Beantextures")
+    node_group_adder_name: bpy.props.StringProperty(name="Node Group Name", description="Name to assign for the new group", default="Beantextures")
     configs: bpy.props.CollectionProperty(type=Beantxs_ConfigEntry, name="Beantextures Configurations", description="List of stored configurations for active scene")
     active_config_idx: bpy.props.IntProperty(name="Index of Active Configuration")
 

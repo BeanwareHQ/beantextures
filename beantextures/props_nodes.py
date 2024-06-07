@@ -3,7 +3,7 @@
 import bpy
 
 def generate_linking_enum_items(self: bpy.types.ShaderNodeGroup, context):
-    """Used by node tree instances. This function returns a list of enum items based on the respecting node tree's (not the instance itself!) `enum_items` property."""
+    """Used by node group instances. This function returns a list of enum items based on the respecting node tree's (not the instance itself!) `enum_items` property."""
     items = self.node_tree.beantextures_props.enum_items
     return [(item.name.upper(), item.name, item.name, item.idx) for item in items]
 
@@ -22,9 +22,9 @@ class Beantxs_NodeTree_props(bpy.types.PropertyGroup):
     link_type: bpy.props.EnumProperty(items=beantextures_link_type, name="Linking type", description="Defines how Beantextures Node links values to images")
 
     # Enum linking specific properties
-    # Custom node trees (or "node groups" on the UI & under bpy.data)
-    # don't support custom enum items. Technically, our enum linking is just
-    # a fancy wrapper to the int linking.
+    # Custom node groups don't support enum sockets.
+    # Technically, our enum linking is just a fancy wrapper
+    # to the int linking.
     enum_items: bpy.props.CollectionProperty(type=Beantxs_EnumItem, name="Enum items", description="Available enum items; only used if linking type is set to enum")
 
 def register():
