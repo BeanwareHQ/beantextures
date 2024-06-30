@@ -2,6 +2,10 @@
 import bpy
 from bpy.types import Operator
 from beantextures.props_settings import Beantxs_ConfigEntry, Beantxs_LinkItem
+from beantextures.ui_node_generator import check_warnings_int, check_warnings_enum, check_warnings_float, check_warnings_int_simple
+
+# TODO: Organize all into common methods and for each of the linking types, override the behavior by some parameter
+# because this is barely extensible right now.
 
 def generate_int_simple_node_group(context, config: Beantxs_ConfigEntry):
     links: list[Beantxs_LinkItem] = config.links # wrong type but it works and I need autocompletion
@@ -57,11 +61,16 @@ def generate_int_simple_node_group(context, config: Beantxs_ConfigEntry):
         node.links.new(gt_node.outputs[0], mult_node.inputs[0])
         node.links.new(lt_node.outputs[0], mult_node.inputs[1])
 
-        img_node: bpy.types.ShaderNodeTexImage = node.nodes.new('ShaderNodeTexImage')
-        img_node.image = link.img
-        img_node.name = "img_" + link.name
-        img_node.location = (prev_mix_inputs_loc[0], prev_mix_inputs_loc[1] - 360)
-        img_node.hide = True
+        if bool(link.img):
+            img_node: bpy.types.ShaderNodeTexImage = node.nodes.new('ShaderNodeTexImage')
+            img_node.image = link.img
+            img_node.name = "img_" + link.name
+            img_node.location = (prev_mix_inputs_loc[0], prev_mix_inputs_loc[1] - 360)
+            img_node.hide = True
+        else:
+            # FIXME: python momen
+            img_node = None
+            node.interface.new_socket(link.name, in_out='INPUT', socket_type='NodeSocketColor')
 
         mix_node: bpy.types.ShaderNodeMix = node.nodes.new('ShaderNodeMix')
         mix_node.name = "mix_" + link.name
@@ -69,8 +78,6 @@ def generate_int_simple_node_group(context, config: Beantxs_ConfigEntry):
         mix_node.location = (prev_mix_nodes_loc[0] + 210, prev_mix_nodes_loc[1])
         mix_node.hide = True
         node.links.new(mult_node.outputs[0], mix_node.inputs[0])
-        node.links.new(img_node.outputs['Color'], mix_node.inputs['B'])
-        prev_mix_nodes_loc = mix_node.location
 
         try:
             node.links.new(prev_mix_node.outputs['Result'], mix_node.inputs['A'])
@@ -79,6 +86,7 @@ def generate_int_simple_node_group(context, config: Beantxs_ConfigEntry):
 
         prev_mix_node = mix_node
 
+
         if config.output_alpha:
             alpha_mix_node: bpy.types.ShaderNodeMix = node.nodes.new('ShaderNodeMix')
             alpha_mix_node.name = "mix_alpha_" + link.name
@@ -86,7 +94,6 @@ def generate_int_simple_node_group(context, config: Beantxs_ConfigEntry):
             alpha_mix_node.data_type = 'FLOAT'
             alpha_mix_node.location = (mix_node.location[0], mix_node.location[1] - 45)
             node.links.new(mult_node.outputs[0], alpha_mix_node.inputs[0])
-            node.links.new(img_node.outputs['Alpha'], alpha_mix_node.inputs['B'])
 
             try:
                 node.links.new(prev_alpha_mix_node.outputs['Result'], alpha_mix_node.inputs['A'])
@@ -94,6 +101,21 @@ def generate_int_simple_node_group(context, config: Beantxs_ConfigEntry):
                 pass
 
             prev_alpha_mix_node = alpha_mix_node
+
+        if img_node is None:
+            node.links.new(group_in.outputs[link.name], mix_node.inputs['B'])
+
+            if config.output_alpha:
+                node.links.new(group_in.outputs[link.name + "_alpha"], alpha_mix_node.inputs['B'])
+
+        else:
+            node.links.new(img_node.outputs['Color'], mix_node.inputs['B'])
+            if config.output_alpha:
+                node.interface.new_socket(link.name + "_alpha", in_out='INPUT', socket_type='NodeSocketFloat')
+                node.links.new(img_node.outputs['Alpha'], alpha_mix_node.inputs['B'])
+
+
+        prev_mix_nodes_loc = mix_node.location
 
         try:
             if link == links[0]:
@@ -521,6 +543,51 @@ class BeantxsOp_GenerateNode(Operator):
             cls.poll_message_set("Set a valid shader node group as a target first!")
         return bool(config.target_node_tree) and isinstance(config.target_node_tree, bpy.types.ShaderNodeTree)
 
+    def draw(self, context):
+        layout = self.layout
+        column = layout.column()
+        column.label(icon='INFO', text="Checking validity of links..")
+
+        settings = context.scene.beantextures_settings
+        config = settings.configs[settings.active_config_idx]
+        errors: dict[str, list[str]] = {} # {location: ["error1", "error2"], ...}
+
+        match config.linking_type:
+            # FIXME: python momen
+            case 'INT_SIMPLE':
+                warning_checker = check_warnings_int_simple
+            case 'INT':
+                warning_checker = check_warnings_int
+            case 'FLOAT':
+                warning_checker = check_warnings_float
+            case 'ENUM':
+                warning_checker = check_warnings_enum
+            case _:
+                warning_checker = check_warnings_int_simple
+
+        if len(config.links) == 0:
+            # TODO: if more config checking is needed, consider making a separate function that
+            # does something similar to check_warnings_<type>
+            errors.update({'Config': ["There is no link available."]})
+        for link in config.links:
+            errors.update({link.name: warning_checker(context, link, config)})
+
+        err_detected = False
+        for err_key in errors.keys():
+            if len(errors[err_key]) == 0:
+                continue
+            err_detected = True
+            box = layout.box()
+            box.label(text=f"On link '{err_key}':")
+            for err_msg in errors[err_key]:
+                box.label(icon='DOT', text=err_msg)
+
+        if err_detected:
+            column.label(icon='ERROR', text="Some warnings found; hit OK to proceed anyways.")
+        else:
+            column.label(icon='CHECKMARK', text="No warnings found; hit OK to proceed.")
+
+        
     def execute(self, context):
         settings = context.scene.beantextures_settings
         config = settings.configs[settings.active_config_idx]
@@ -536,6 +603,12 @@ class BeantxsOp_GenerateNode(Operator):
 
         self.report({'INFO'}, f"Generated tree for node group '{config.name}'")
         return {'FINISHED'}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    
 
 def register():
     bpy.utils.register_class(BeantxsOp_GenerateNode)

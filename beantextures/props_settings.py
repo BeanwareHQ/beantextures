@@ -5,7 +5,7 @@ import bpy
 # TODO: link to the same array at props_nodes.py?
 beantextures_link_type = [
         ('INT_SIMPLE', "Int (Simple)", "Simple integer linking", 0),
-        ('INT', "Int", "Integer linking (advanced)", 1),
+        ('INT', "Int (Ranged)", "Integer linking (advanced)", 1),
         ('FLOAT', "Float", "Float linking", 2),
         ('ENUM', "Enum", "Enum linking", 3),
 ]
@@ -30,11 +30,11 @@ class Beantxs_ConfigEntry(bpy.types.PropertyGroup):
     active_link_idx: bpy.props.IntProperty(name="Index of Active Link")
     links: bpy.props.CollectionProperty(type=Beantxs_LinkItem, name="Configured Links", description="Collection of defined value-image links")
 
-    int_max: bpy.props.IntProperty(name="Maximum Int Value")
-    int_min: bpy.props.IntProperty(name="Maximum Int Value")
+    int_max: bpy.props.IntProperty(name="Maximum Int Value", default=2)
+    int_min: bpy.props.IntProperty(name="Maximum Int Value", default=1)
 
-    float_max: bpy.props.FloatProperty(name="Maximum Float Value")
-    float_min: bpy.props.FloatProperty(name="Minimum Float Value")
+    float_max: bpy.props.FloatProperty(name="Maximum Float Value", default=2.0)
+    float_min: bpy.props.FloatProperty(name="Minimum Float Value", default=1.0)
 
 class Beantxs_GlobalSettings(bpy.types.PropertyGroup):
     node_group_adder_name: bpy.props.StringProperty(name="Node Group Name", description="Name to assign for the new group", default="Beantextures")

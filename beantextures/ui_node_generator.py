@@ -1,6 +1,7 @@
 """UI Interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
+from beantextures.ops_settings import BeantxsOp_NewNodeGroup
 from beantextures.props_settings import Beantxs_LinkItem, Beantxs_ConfigEntry
 
 # Helper functions
@@ -66,14 +67,11 @@ def check_warnings_int(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEn
     if (search_result := search_for_duplicate_int_link_value(context, link))[0]:
         warnings.append(f"Range overlaps with link '{search_result[1]}'.")
 
-    if link.int_lt - link.int_gt <= 1:
-        warnings.append(f"There's no integer greater than {link.int_gt} and less than {link.int_lt}!")
-
     if link.int_lt < link.int_gt:
-        warnings.append("Range is invalid!")
+        warnings.append("The assigned greater than digit is bigger than its less than!")
 
     if link.int_lt > config.int_max + 1 or link.int_gt < config.int_min - 1:
-        warnings.append("Range is out of the set max/min range.")
+        warnings.append("Range is out of the set max/min range!")
 
     return warnings
 
@@ -117,7 +115,7 @@ class NodeTreePanel(BeantexturesNodePanel):
         layout = self.layout
         layout.use_property_split = True
         layout.row().prop(bpy.context.scene.beantextures_settings, "node_group_adder_name")
-        layout.row().operator("beantextures.new_node_group", text="Add", icon='PLUS')
+        layout.row().operator(BeantxsOp_NewNodeGroup.bl_idname, text="Add", icon='PLUS')
 
 class BEANTEXTURES_UL_ConfigsListRenderer(UIList):
     """
