@@ -39,8 +39,8 @@ def add_new_link(context) -> Beantxs_LinkItem:
     link.int_simple_val = proper_idx + 1
     link.int_gt = proper_idx
     link.int_lt = proper_idx + 2
-    link.float_gt = proper_idx + 1.1
-    link.float_lt = proper_idx + 2
+    link.float_gt = proper_idx + 1
+    link.float_lt = proper_idx + 2.1
 
     config.active_link_idx = proper_idx
 

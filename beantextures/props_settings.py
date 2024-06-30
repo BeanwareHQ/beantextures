@@ -34,7 +34,7 @@ class Beantxs_ConfigEntry(bpy.types.PropertyGroup):
     int_min: bpy.props.IntProperty(name="Maximum Int Value", default=1)
 
     float_max: bpy.props.FloatProperty(name="Maximum Float Value", default=2.0)
-    float_min: bpy.props.FloatProperty(name="Minimum Float Value", default=1.0)
+    float_min: bpy.props.FloatProperty(name="Minimum Float Value", default=0.9)
 
 class Beantxs_GlobalSettings(bpy.types.PropertyGroup):
     node_group_adder_name: bpy.props.StringProperty(name="Node Group Name", description="Name to assign for the new group", default="Beantextures")
