@@ -1,6 +1,7 @@
 """Custom attributes for Blender node and node tree classes."""
 
 import bpy
+from beantextures.props_settings import beantextures_link_type
 
 def generate_linking_enum_items(self: bpy.types.ShaderNodeGroup, context):
     """Used by node group instances. This function returns a list of enum items based on the respecting node tree's (not the instance itself!) `enum_items` property."""
@@ -10,13 +11,6 @@ def generate_linking_enum_items(self: bpy.types.ShaderNodeGroup, context):
 class Beantxs_EnumItem(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Enum item name", description="Human-readable name assigned by user")
     idx: bpy.props.IntProperty(name="Enum item index", description="Integer linked to enum item")
-
-beantextures_link_type = [
-        ('INT_SIMPLE', "Int", "Simple integer linking", 0),
-        ('INT', "Int", "Integer linking (advanced)", 1),
-        ('FLOAT', "Float", "Float linking", 2),
-        ('ENUM', "Enum", "Enum linking", 3),
-]
 
 class Beantxs_NodeTree_props(bpy.types.PropertyGroup):
     link_type: bpy.props.EnumProperty(items=beantextures_link_type, name="Linking type", description="Defines how Beantextures Node links values to images")

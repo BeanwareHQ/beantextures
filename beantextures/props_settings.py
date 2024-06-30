@@ -2,8 +2,7 @@
 
 import bpy
 
-# TODO: link to the same array at props_nodes.py?
-beantextures_link_type = [
+beantextures_link_type: list[tuple[str, str, str, int]] = [
         ('INT_SIMPLE', "Int (Simple)", "Simple integer linking", 0),
         ('INT', "Int (Ranged)", "Integer linking (advanced)", 1),
         ('FLOAT', "Float", "Float linking", 2),

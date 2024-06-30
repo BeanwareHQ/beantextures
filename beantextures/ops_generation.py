@@ -14,7 +14,6 @@ class BtxsNodeTreeBuilder:
 
     def generate(self, config: Beantxs_ConfigEntry):
         """Steps of building the node tree (abstracted)."""
-        # For the start of the loop, these are are None and the sockets are reserved for the "fallback" image.
         prev_mix_color_node: ShaderNodeMix | None = None # FIXME: python momen
         prev_mix_alpha_node: ShaderNodeMix | None = None # FIXME: python momen
 
@@ -366,6 +365,7 @@ class FloatNodeTreeBuilder(BtxsNodeTreeBuilder):
 
     def setup_node_tree_attributes(self, config, node):
         node.interface.items_tree['Value'].default_value = config.float_min 
+        node.interface.items_tree['Value'].subtype = 'FACTOR'
 
 class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
     def __init__(self, config) -> None:

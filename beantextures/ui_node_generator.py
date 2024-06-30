@@ -60,6 +60,9 @@ def check_warnings_int_simple(context, link: Beantxs_LinkItem, config: Beantxs_C
     if link.int_simple_val > config.int_max or link.int_simple_val < config.int_min:
         warnings.append(f"Bound number is out of the set max/min range.")
 
+    if search_for_duplicate_enum_name(context, link):
+        warnings.append("Link with similar name already exists.")
+
     return warnings
 
 def check_warnings_int(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
@@ -73,6 +76,9 @@ def check_warnings_int(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEn
     if link.int_lt > config.int_max + 1 or link.int_gt < config.int_min - 1:
         warnings.append("Range is out of the set max/min range!")
 
+    if search_for_duplicate_enum_name(context, link):
+        warnings.append("Link with similar name already exists.")
+
     return warnings
 
 def check_warnings_float(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
@@ -85,6 +91,9 @@ def check_warnings_float(context, link: Beantxs_LinkItem, config: Beantxs_Config
 
     if link.float_lt > config.float_max or link.float_gt < config.float_min:
         warnings.append("Range is out of the set max/min range.")
+
+    if search_for_duplicate_enum_name(context, link):
+        warnings.append("Link with similar name already exists.")
 
     return warnings
 
