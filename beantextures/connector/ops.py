@@ -19,9 +19,13 @@ def remove_connector_item(context, idx: int):
     connector.connectors.remove(idx)
 
 class BeantxsOp_ConnectorOperator(Operator):
+
     @classmethod
     def poll(cls, context):
-        return (context.active_bone is not None)
+        try:
+            return bool(context.active_bone and context.mode == 'POSE' and context.active_bone.beantextures_connector)
+        except AttributeError:
+            return False
 
 class BeantxsOp_NewConnectorItem(BeantxsOp_ConnectorOperator):
     """Add a new connector item"""

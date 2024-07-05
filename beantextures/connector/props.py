@@ -27,6 +27,7 @@ class Btx_ConnectorInstance(bpy.types.PropertyGroup):
 class Btxs_Connector(bpy.types.PropertyGroup):
     connectors: bpy.props.CollectionProperty(type=Btx_ConnectorInstance, name="Connector Items")
     active_connector_idx: bpy.props.IntProperty(name="Index of Active Connector Item")
+    menu_type: bpy.props.EnumProperty(items=beantextures_connector_menu_types, name="Menu Type", default='LIST')
 
 def register():
     bpy.utils.register_class(Btxs_ConnectorValidNode)

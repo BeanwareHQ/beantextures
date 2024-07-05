@@ -25,7 +25,7 @@ def ui_scale():
     prefs = bpy.context.preferences.system
     return prefs.dpi / DPI
 
-def prefs() -> 'Btxs_IV_ScenePreferences':
+def prefs() -> 'BtxsOp_IV_ScenePreferences':
     return bpy.context.scene.beantextures_icon_viewer_prefs
 
 class Icons:
@@ -95,7 +95,7 @@ class Icons:
         col_idx = 0
         for i, icon in enumerate(filtered_icons):
             p = row.operator(
-                Btxs_IV_OT_icon_select.bl_idname, text="",
+                BtxsOp_IV_OT_icon_select.bl_idname, text="",
                 icon=icon, emboss=icon == selected_icon)
             p.icon = icon
             p.force_copy_on_select = not self.is_popup
@@ -123,48 +123,31 @@ class Btxs_IV_IconsMgr:
     def update_icons(self, context):
         self.popup_icons.update()
 
-icons_mgr = Btxs_IV_IconsMgr
+icons_mgr = Btxs_IV_IconsMgr()
 
-class Btxs_IV_ScenePreferences(bpy.types.PropertyGroup):
+class BtxsOp_IV_ScenePreferences(bpy.types.PropertyGroup):
     show_history: BoolProperty(
         name="Show History",
         description="Show history", default=True)
     show_brush_icons: BoolProperty(
         name="Show Brush Icons",
         description="Show brush icons", default=True,
-        update=icons_mgr.update_icons)
+        update=lambda s, c: icons_mgr.update_icons(c))
     show_matcap_icons: BoolProperty(
         name="Show Matcap Icons",
         description="Show matcap icons", default=True,
-        update=icons_mgr.update_icons)
+        update=lambda s, c: icons_mgr.update_icons(c))
     show_event_icons: BoolProperty(
         name="Show Event Icons",
         description="Show event icons", default=True,
-        update=icons_mgr.update_icons)
+        update=lambda s, c: icons_mgr.update_icons(c))
     show_colorset_icons: BoolProperty(
         name="Show Colorset Icons",
         description="Show colorset icons", default=True,
-        update=icons_mgr.update_icons)
-    copy_on_select: BoolProperty(
-        name="Copy Icon On Click",
-        description="Copy icon on click", default=True)
-    close_on_select: BoolProperty(
-        name="Close Popup On Click",
-        description=(
-            "Close the popup on click.\n"
-            "Not supported by some windows (User Preferences, Render)"
-        ),
-        default=False)
-    auto_focus_filter: BoolProperty(
-        name="Auto Focus Input Field",
-        description="Auto focus input field", default=True)
-    show_header: BoolProperty(
-        name="Show Header",
-        description="Show the header in the Python Console",
-        default=True)
+        update=lambda s, c: icons_mgr.update_icons(c))
 
-class Btxs_IV_OT_icon_select(bpy.types.Operator):
-    bl_idname = "beantextures.set_icon"
+class BtxsOp_IV_OT_icon_select(bpy.types.Operator):
+    bl_idname = "beantextures.icon_select"
     bl_label = ""
     bl_description = "Select the icon"
     bl_options = {'INTERNAL'}
@@ -179,12 +162,6 @@ class Btxs_IV_OT_icon_select(bpy.types.Operator):
     def execute(self, context):
         icons_mgr.popup_icons.selected_icon = self.icon
         pr = prefs()
-        if pr.copy_on_select or self.force_copy_on_select:
-            context.window_manager.clipboard = self.icon
-            self.report({'INFO'}, self.icon)
-
-            if pr.close_on_select and Btxs_IV_OT_icons_set.instance:
-                Btxs_IV_OT_icons_set.instance.close()
 
         if pr.show_history:
             if self.icon in HISTORY:
@@ -195,26 +172,31 @@ class Btxs_IV_OT_icon_select(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class Btxs_IV_OT_icons_set(bpy.types.Operator):
-    bl_idname = "beantextures.icons_show"
-    bl_label = "Icon Viewer"
-    bl_description = "Icon viewer"
+class BtxsOp_IV_OT_icons_set(bpy.types.Operator):
+    bl_idname = "beantextures.icon_set"
+    bl_label = "Icon Selector"
+    bl_description = "Select an icon for a connector item"
     bl_property = "filter_auto_focus"
 
     instance = None
+
+    @classmethod
+    def poll(cls, context) -> bool:
+        connector = context.active_bone.beantextures_connector
+        # FIXME: wonky
+        try:
+            connector.connectors[connector.active_connector_idx]
+        except IndexError:
+            return False
+        return (context.bone is not None)
 
     def set_filter(self, value):
         icons_mgr.popup_icons.filter = value
 
     def set_selected_icon(self, value):
-        if Btxs_IV_OT_icons_set.instance:
-            Btxs_IV_OT_icons_set.instance.auto_focusable = False
+        if BtxsOp_IV_OT_icons_set.instance:
+            BtxsOp_IV_OT_icons_set.instance.auto_focusable = False
 
-    filter_auto_focus: StringProperty(
-        description="Filter",
-        get=lambda s: icons_mgr.popup_icons.filter,
-        set=set_filter,
-        options={'TEXTEDIT_UPDATE', 'SKIP_SAVE'})
     filter: StringProperty(
         description="Filter",
         get=lambda s: icons_mgr.popup_icons.filter,
@@ -240,25 +222,7 @@ class Btxs_IV_OT_icons_set(bpy.types.Operator):
         row.prop(pr, "show_event_icons", text="", icon='HAND')
         row.separator()
 
-        row.prop(
-            pr, "copy_on_select", text="",
-            icon='COPYDOWN', toggle=True)
-        if pr.copy_on_select:
-            sub = row.row(align=True)
-            if bpy.context.window.screen.name == "temp":
-                sub.alert = True
-            sub.prop(
-                pr, "close_on_select", text="",
-                icon='RESTRICT_SELECT_OFF', toggle=True)
-        row.prop(
-            pr, "auto_focus_filter", text="",
-            icon='OUTLINER_DATA_FONT', toggle=True)
-        row.separator()
-
-        if self.auto_focusable and pr.auto_focus_filter:
-            row.prop(self, "filter_auto_focus", text="", icon='VIEWZOOM')
-        else:
-            row.prop(self, "filter", text="", icon='VIEWZOOM')
+        row.prop(self, "filter", text="", icon='VIEWZOOM')
 
         if self.selected_icon:
             row = header.row()
@@ -289,27 +253,25 @@ class Btxs_IV_OT_icons_set(bpy.types.Operator):
         return True
 
     def cancel(self, context):
-        Btxs_IV_OT_icons_set.instance = None
-        IV_PT_icons.tag_redraw()
+        BtxsOp_IV_OT_icons_set.instance = None
 
     def execute(self, context):
-        if not Btxs_IV_OT_icons_set.instance:
+        connector = context.active_bone.beantextures_connector
+        item = connector.connectors[connector.active_connector_idx]
+        
+        if not BtxsOp_IV_OT_icons_set.instance:
             return {'CANCELLED'}
-        Btxs_IV_OT_icons_set.instance = None
+        BtxsOp_IV_OT_icons_set.instance = None
 
-        pr = prefs()
-        if self.selected_icon and not pr.copy_on_select:
-            context.window_manager.clipboard = self.selected_icon
-            self.report({'INFO'}, self.selected_icon)
-        icons_mgr.popup_icons.selected_icon = ""
+        if len(self.selected_icon) > 0:
+            item.icon = self.selected_icon
 
-        IV_PT_icons.tag_redraw()
         return {'FINISHED'}
 
     def invoke(self, context, event):
         icons_mgr.popup_icons.selected_icon = ""
         icons_mgr.popup_icons.filter = ""
-        Btxs_IV_OT_icons_set.instance = self
+        BtxsOp_IV_OT_icons_set.instance = self
         self.auto_focusable = True
 
         num_cols = self.get_num_cols(len(icons_mgr.popup_icons.filtered_icons))
@@ -320,22 +282,17 @@ class Btxs_IV_OT_icons_set(bpy.types.Operator):
         return context.window_manager.invoke_props_dialog(
             self, width=self.width)
 
-def draw_console_header(self, context):
-    if not prefs().show_header:
-        return
-    self.layout.operator(Btxs_IV_OT_icons_set.bl_idname)
-
 classes = (
-    Btxs_IV_ScenePreferences,
-    Btxs_IV_OT_icon_select,
-    Btxs_IV_OT_icons_set,
+    BtxsOp_IV_OT_icon_select,
+    BtxsOp_IV_ScenePreferences,
+    BtxsOp_IV_OT_icons_set,
 )
 
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Scene.beantextures_icon_viewer_prefs = bpy.props.PointerProperty(type=Btxs_IV_ScenePreferences)
+    bpy.types.Scene.beantextures_icon_viewer_prefs = bpy.props.PointerProperty(type=BtxsOp_IV_ScenePreferences)
 
 def unregister():
     for cls in classes:
