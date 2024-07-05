@@ -2,6 +2,7 @@
 import bpy
 from bpy.types import UIList
 from beantextures.connector.icon_picker import ICONS, BtxsOp_IV_OT_icons_set
+from beantextures.connector.ops import BtxsOp_ModifyNodeSelection, BtxsOp_ReloadNodeNames
 
 def check_icon_validity(icon_name: str) -> bool:
     return (icon_name in ICONS)
@@ -88,10 +89,11 @@ class Btxs_ConnectorItemsList(bpy.types.Panel):
             item = connector.connectors[idx]
 
             col = layout.column()
+            row = col.row(align=True)
+            row.prop_search(item, "node_name", item, "valid_nodes", text="Node", icon='NODE')
+            row.operator(BtxsOp_ReloadNodeNames.bl_idname, text="", icon='FILE_REFRESH')
+            row.operator(BtxsOp_ModifyNodeSelection.bl_idname, text="", icon='PREFERENCES')
             col.prop(item, "menu_index", text="Menu Index")
-
-            row = col.row()
-
 
         except IndexError:
             layout.column().label(text="No connector item available.")

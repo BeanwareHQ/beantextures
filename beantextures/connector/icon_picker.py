@@ -157,7 +157,13 @@ class BtxsOp_IV_OT_icon_select(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context) -> bool:
-        return (context.bone is not None)
+        connector = context.active_bone.beantextures_connector
+        # FIXME: wonky
+        try:
+            connector.connectors[connector.active_connector_idx]
+        except IndexError:
+            return False
+        return (context.active_bone is not None)
 
     def execute(self, context):
         icons_mgr.popup_icons.selected_icon = self.icon
@@ -188,7 +194,8 @@ class BtxsOp_IV_OT_icons_set(bpy.types.Operator):
             connector.connectors[connector.active_connector_idx]
         except IndexError:
             return False
-        return (context.bone is not None)
+        return (context.active_bone is not None)
+
 
     def set_filter(self, value):
         icons_mgr.popup_icons.filter = value
