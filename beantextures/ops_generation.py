@@ -16,6 +16,8 @@ class BtxsNodeTreeBuilder:
         """Steps of building the node tree (abstracted)."""
         prev_mix_color_node: ShaderNodeMix | None = None # FIXME: python momen
         prev_mix_alpha_node: ShaderNodeMix | None = None # FIXME: python momen
+        curr_mix_color_node = None
+        curr_mix_alpha_node = None
 
         node = self.init_node_tree(config)
         self.add_io_sockets(config, node)
@@ -219,7 +221,7 @@ class BtxsNodeTreeBuilder:
         """(Only if `output_alpha` is set to True under `config`) Connect the alpha channel of an image node to its mix node."""
         try:
             node.links.new(img_node.outputs['Alpha'], mix_node.inputs['B'])
-        except NameError:
+        except AttributeError:
             return
 
     def LINKLOOP_add_alpha_input_socket(self, node: NodeTree, link: Btxs_LinkItem):
@@ -232,7 +234,7 @@ class BtxsNodeTreeBuilder:
         """(Only if no image is supplied for the link) Link the alpha channel input socket to a mix node."""
         try:
             node.links.new(group_in.outputs[link.name + "_alpha"], mix_node.inputs['B'])
-        except NameError:
+        except AttributeError:
             return
 
     def LINKLOOP_set_fallback_image(self, node: NodeTree, fallback_img: Image, color_mix_node: ShaderNodeMix) -> ShaderNodeTexImage:
@@ -250,7 +252,7 @@ class BtxsNodeTreeBuilder:
         """Set a fallback image (alpha channel)."""
         try:
             node.links.new(fallback_img_node.outputs['Alpha'], alpha_mix_node.inputs['A'])
-        except NameError:
+        except AttributeError:
             return
 
     def LINKLOOP_set_falback_color(self, color_mix_node: ShaderNodeMix):
@@ -261,7 +263,7 @@ class BtxsNodeTreeBuilder:
         try:
             group_out.location = (prev_mix_nodes_loc[0] + 200, prev_mix_nodes_loc[1])
             node.links.new(curr_mix_color_node.outputs['Result'], group_out.inputs['Image'])
-        except NameError:
+        except AttributeError:
             return
 
     def connect_last_alpha_mix_node(self, node: NodeTree, group_out: NodeGroupOutput, curr_alpha_mix_node: ShaderNodeMix):
@@ -271,7 +273,7 @@ class BtxsNodeTreeBuilder:
         """(Only if no fallback image is supplied under `config` Set a fallback alpha color."""
         try:
             alpha_mix_node.inputs['A'].default_value = 0.0 # type: ignore
-        except NameError:
+        except AttributeError:
             return
 
     def setup_node_tree_attributes(self, config, node):

@@ -13,7 +13,11 @@ class BEANTEXTURES_UL_ConnectorItemsListRenderer(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             if item:
-                layout.operator(BtxsOp_IV_OT_icons_set.bl_idname, text="", icon=item.icon, emboss=True)
+                # TODO: make icons across items modifiable instead of only the active one.
+                if item == data.connectors[data.active_connector_idx]:
+                    layout.operator(BtxsOp_IV_OT_icons_set.bl_idname, text="", icon=item.icon, emboss=True)
+                else:
+                    layout.label(text="", icon=item.icon)
                 layout.prop(item, "name", text="", emboss=False)
                 if item.show:
                     layout.prop(item, "show", text="", emboss=False, icon='HIDE_OFF')
@@ -43,6 +47,7 @@ class Btxs_ConnectorPanel(bpy.types.Panel):
     def draw(self, context):
         connector = context.active_bone.beantextures_connector
         layout = self.layout
+        layout.operator
 
         layout.column().label(text="Display as:")
         row = layout.row()
