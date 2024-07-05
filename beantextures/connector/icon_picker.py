@@ -25,7 +25,7 @@ def ui_scale():
     prefs = bpy.context.preferences.system
     return prefs.dpi / DPI
 
-def prefs() -> 'BtxsOp_IV_ScenePreferences':
+def prefs() -> 'Btxs_IV_ScenePreferences':
     return bpy.context.scene.beantextures_icon_viewer_prefs
 
 class Icons:
@@ -125,7 +125,7 @@ class Btxs_IV_IconsMgr:
 
 icons_mgr = Btxs_IV_IconsMgr()
 
-class BtxsOp_IV_ScenePreferences(bpy.types.PropertyGroup):
+class Btxs_IV_ScenePreferences(bpy.types.PropertyGroup):
     show_history: BoolProperty(
         name="Show History",
         description="Show history", default=True)
@@ -284,7 +284,7 @@ class BtxsOp_IV_OT_icons_set(bpy.types.Operator):
 
 classes = (
     BtxsOp_IV_OT_icon_select,
-    BtxsOp_IV_ScenePreferences,
+    Btxs_IV_ScenePreferences,
     BtxsOp_IV_OT_icons_set,
 )
 
@@ -292,7 +292,7 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
-    bpy.types.Scene.beantextures_icon_viewer_prefs = bpy.props.PointerProperty(type=BtxsOp_IV_ScenePreferences)
+    bpy.types.Scene.beantextures_icon_viewer_prefs = bpy.props.PointerProperty(type=Btxs_IV_ScenePreferences)
 
 def unregister():
     for cls in classes:

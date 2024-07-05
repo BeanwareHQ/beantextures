@@ -1,7 +1,7 @@
 """Operators used to generate node groups."""
 import bpy
 from bpy.types import Image, Operator, NodeTree, NodeGroupInput, NodeGroupOutput, NodeReroute, ShaderNodeMath, ShaderNodeTexImage, ShaderNodeMix
-from beantextures.props_settings import Beantxs_ConfigEntry, Beantxs_LinkItem
+from beantextures.props_settings import Btxs_ConfigEntry, Btxs_LinkItem
 from beantextures.ui_node_generator import check_warnings_int, check_warnings_enum, check_warnings_float, check_warnings_int_simple
 
 class BtxsNodeTreeBuilder:
@@ -9,10 +9,10 @@ class BtxsNodeTreeBuilder:
     prev_mix_inputs_loc = (530, 470)
     prev_mix_nodes_loc = (1000, 0)
 
-    def __init__(self, config: Beantxs_ConfigEntry):
+    def __init__(self, config: Btxs_ConfigEntry):
         self.generate(config)
 
-    def generate(self, config: Beantxs_ConfigEntry):
+    def generate(self, config: Btxs_ConfigEntry):
         """Steps of building the node tree (abstracted)."""
         prev_mix_color_node: ShaderNodeMix | None = None # FIXME: python momen
         prev_mix_alpha_node: ShaderNodeMix | None = None # FIXME: python momen
@@ -124,7 +124,7 @@ class BtxsNodeTreeBuilder:
         return maths_reroute_node
 
     ##### Methods used for the link loop (for link in config.links) #####
-    def LINKLOOP_add_math_nodes(self, link: Beantxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
+    def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         """Add greater than node, less than node, and multiply node for the link. Also connect them together properly.
         To be exact, the logic is: if `input` > `gt threshold` `and` `input` < `lt threshold` then `true`.
         The `and` here is replaced with the `Multiply` math node which is similar to a boolean `AND` with two boolean (0.00/1.00) inputs.
@@ -158,7 +158,7 @@ class BtxsNodeTreeBuilder:
 
         return (gt_node, lt_node, mult_node, prev_mix_inputs_loc)
 
-    def LINKLOOP_add_img(self, link: Beantxs_LinkItem, node: NodeTree, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeTexImage, tuple[int, int]]:
+    def LINKLOOP_add_img(self, link: Btxs_LinkItem, node: NodeTree, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeTexImage, tuple[int, int]]:
         """(Only if an image is supplied for the link) add and configure an image texture node."""
         # ShaderNodeTexImage is a subclass of Node
         img_node: ShaderNodeTexImage = node.nodes.new('ShaderNodeTexImage') # type: ignore
@@ -169,15 +169,15 @@ class BtxsNodeTreeBuilder:
         img_node.hide = True
         return (img_node, prev_mix_inputs_loc)
 
-    def LINKLOOP_add_color_input_socket(self, link: Beantxs_LinkItem, node: NodeTree) -> None:
+    def LINKLOOP_add_color_input_socket(self, link: Btxs_LinkItem, node: NodeTree) -> None:
         """(Only if no image is supplied for the link) add a color input socket for the node tree."""
         node.interface.new_socket(link.name, in_out='INPUT', socket_type='NodeSocketColor')
 
-    def LINKLOOP_connect_color_input_socket(self, link: Beantxs_LinkItem, node: NodeTree, group_in: NodeGroupInput, mix_node: ShaderNodeMix):
+    def LINKLOOP_connect_color_input_socket(self, link: Btxs_LinkItem, node: NodeTree, group_in: NodeGroupInput, mix_node: ShaderNodeMix):
         """(Only if no image is supplied for the link) Link the color input socket to a mix color node."""
         node.links.new(group_in.outputs[link.name], mix_node.inputs['B'])
 
-    def LINKLOOP_add_mix_color_node(self, link: Beantxs_LinkItem, node: NodeTree, multiply_node: ShaderNodeMath, prev_mix_nodes_loc: tuple[int, int]) -> tuple[ShaderNodeMix, tuple[int, int]]:
+    def LINKLOOP_add_mix_color_node(self, link: Btxs_LinkItem, node: NodeTree, multiply_node: ShaderNodeMath, prev_mix_nodes_loc: tuple[int, int]) -> tuple[ShaderNodeMix, tuple[int, int]]:
         """Add a mix color node."""
         # ShaderNodeMix is a subclass of Node
         mix_node: bpy.types.ShaderNodeMix = node.nodes.new('ShaderNodeMix') # type: ignore
@@ -194,7 +194,7 @@ class BtxsNodeTreeBuilder:
         if previous_node is not None:
             node.links.new(previous_node.outputs['Result'], current_node.inputs['A'])
 
-    def LINKLOOP_add_mix_alpha_node(self, link: Beantxs_LinkItem, node: NodeTree, mix_color_node: ShaderNodeMix, multiply_node: ShaderNodeMath) -> ShaderNodeMix:
+    def LINKLOOP_add_mix_alpha_node(self, link: Btxs_LinkItem, node: NodeTree, mix_color_node: ShaderNodeMix, multiply_node: ShaderNodeMath) -> ShaderNodeMix:
         """Add a mix node (for the alpha channel)."""
         # ShaderNodeMix is a subclass of Node
         alpha_mix_node: bpy.types.ShaderNodeMix = node.nodes.new('ShaderNodeMix') # type: ignore
@@ -222,13 +222,13 @@ class BtxsNodeTreeBuilder:
         except NameError:
             return
 
-    def LINKLOOP_add_alpha_input_socket(self, node: NodeTree, link: Beantxs_LinkItem):
+    def LINKLOOP_add_alpha_input_socket(self, node: NodeTree, link: Btxs_LinkItem):
         """(Only if no image is supplied for the link) add an alpha channel input socket for the node tree."""
         node.interface.new_socket(link.name + "_alpha", in_out='INPUT', socket_type='NodeSocketFloat')
         node.interface.items_tree[link.name + "_alpha"].max_value = 1.0
         node.interface.items_tree[link.name + "_alpha"].min_value = 0.0
 
-    def LINKLOOP_connect_alpha_input_socket(self, link: Beantxs_LinkItem, node: NodeTree, group_in: NodeGroupInput, mix_node: ShaderNodeMix):
+    def LINKLOOP_connect_alpha_input_socket(self, link: Btxs_LinkItem, node: NodeTree, group_in: NodeGroupInput, mix_node: ShaderNodeMix):
         """(Only if no image is supplied for the link) Link the alpha channel input socket to a mix node."""
         try:
             node.links.new(group_in.outputs[link.name + "_alpha"], mix_node.inputs['B'])
@@ -279,14 +279,14 @@ class BtxsNodeTreeBuilder:
         node.interface.items_tree['Value'].subtype = 'FACTOR'
 
 class IntSimpleNodeTreeBuilder(BtxsNodeTreeBuilder):
-    def __init__(self, config: Beantxs_ConfigEntry):
+    def __init__(self, config: Btxs_ConfigEntry):
         super().__init__(config)
 
 class IntNodeTreeBuilder(BtxsNodeTreeBuilder):
-    def __init__(self, config: Beantxs_ConfigEntry):
+    def __init__(self, config: Btxs_ConfigEntry):
         super().__init__(config)
 
-    def LINKLOOP_add_math_nodes(self, link: Beantxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
+    def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         # ShaderNodeMath is a subclass of Node
         gt_node: bpy.types.ShaderNodeMath = node.nodes.new('ShaderNodeMath') # type: ignore
         gt_node.name = "gt_" + link.name
@@ -320,7 +320,7 @@ class IntNodeTreeBuilder(BtxsNodeTreeBuilder):
         node.interface.items_tree['Value'].subtype = 'NONE'
 
 class FloatNodeTreeBuilder(BtxsNodeTreeBuilder):
-    def __init__(self, config: Beantxs_ConfigEntry):
+    def __init__(self, config: Btxs_ConfigEntry):
         super().__init__(config)
 
     def add_io_sockets(self, config, node: NodeTree):
@@ -334,7 +334,7 @@ class FloatNodeTreeBuilder(BtxsNodeTreeBuilder):
         if config.output_alpha: 
             node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
 
-    def LINKLOOP_add_math_nodes(self, link: Beantxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
+    def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         # ShaderNodeMath is a subclass of Node
         gt_node: bpy.types.ShaderNodeMath = node.nodes.new('ShaderNodeMath') # type: ignore
         gt_node.name = "gt_" + link.name
@@ -383,7 +383,7 @@ class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
         if config.output_alpha: 
             node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
 
-    def LINKLOOP_add_math_nodes(self, link: Beantxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
+    def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         enum_item = node.beantextures_props.enum_items.add()
         enum_item.name = link.name
         enum_item.idx = self.enum_idx
@@ -417,7 +417,7 @@ class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
         self.enum_idx += 1
         return (gt_node, lt_node, mult_node, prev_mix_inputs_loc)
 
-class BeantxsOp_GenerateNode(Operator):
+class BtxsOp_GenerateNode(Operator):
     """Generate node tree using active configuration"""
     bl_label = "Generate Node Tree"
     bl_idname = "beantextures.generate_node_tree"
@@ -460,7 +460,7 @@ class BeantxsOp_GenerateNode(Operator):
             # does something similar to check_warnings_<type>
             errors.update({'configuration': ["There is no link available."]})
         for link in config.links:
-            errors.update({f"link 'link.name'": warning_checker(context, link, config)})
+            errors.update({f"link '{link.name}'": warning_checker(context, link, config)})
 
         err_detected = False
         for err_key in errors.keys():
@@ -501,7 +501,7 @@ class BeantxsOp_GenerateNode(Operator):
     
 
 def register():
-    bpy.utils.register_class(BeantxsOp_GenerateNode)
+    bpy.utils.register_class(BtxsOp_GenerateNode)
 
 def unregister():
-    bpy.utils.unregister_class(BeantxsOp_GenerateNode)
+    bpy.utils.unregister_class(BtxsOp_GenerateNode)

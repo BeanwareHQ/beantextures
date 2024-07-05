@@ -1,8 +1,8 @@
 """User interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
-from beantextures.ops_settings import BeantxsOp_NewNodeGroup
-from beantextures.props_settings import Beantxs_LinkItem, Beantxs_ConfigEntry
+from beantextures.ops_settings import BtxsOp_NewNodeGroup
+from beantextures.props_settings import Btxs_LinkItem, Btxs_ConfigEntry
 
 # Helper functions
 
@@ -52,7 +52,7 @@ def search_for_duplicate_enum_name(context, link) -> bool:
 
 # Warning checkers
 
-def check_warnings_int_simple(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
+def check_warnings_int_simple(context, link: Btxs_LinkItem, config: Btxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
     if (search_result := search_for_duplicate_int_simple_link_value(context, link))[0]:
         warnings.append(f"Index has been used by link '{search_result[1]}'.")
@@ -65,7 +65,7 @@ def check_warnings_int_simple(context, link: Beantxs_LinkItem, config: Beantxs_C
 
     return warnings
 
-def check_warnings_int(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
+def check_warnings_int(context, link: Btxs_LinkItem, config: Btxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
     if (search_result := search_for_duplicate_int_link_value(context, link))[0]:
         warnings.append(f"Range overlaps with link '{search_result[1]}'.")
@@ -81,7 +81,7 @@ def check_warnings_int(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEn
 
     return warnings
 
-def check_warnings_float(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
+def check_warnings_float(context, link: Btxs_LinkItem, config: Btxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
     if (search_result := search_for_duplicate_float_link_value(context, link))[0]:
         warnings.append(f"Range overlaps with link '{search_result[1]}'.")
@@ -97,7 +97,7 @@ def check_warnings_float(context, link: Beantxs_LinkItem, config: Beantxs_Config
 
     return warnings
 
-def check_warnings_enum(context, link: Beantxs_LinkItem, config: Beantxs_ConfigEntry) -> list[str]:
+def check_warnings_enum(context, link: Btxs_LinkItem, config: Btxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
 
     if search_for_duplicate_enum_name(context, link):
@@ -124,7 +124,7 @@ class NodeTreePanel(BeantexturesNodePanel):
         layout = self.layout
         layout.use_property_split = True
         layout.row().prop(bpy.context.scene.beantextures_settings, "node_group_adder_name")
-        layout.row().operator(BeantxsOp_NewNodeGroup.bl_idname, text="Add", icon='PLUS')
+        layout.row().operator(BtxsOp_NewNodeGroup.bl_idname, text="Add", icon='PLUS')
 
 class BEANTEXTURES_UL_ConfigsListRenderer(UIList):
     """

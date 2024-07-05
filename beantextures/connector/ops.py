@@ -18,7 +18,7 @@ def remove_connector_item(context, idx: int):
 
     connector.connectors.remove(idx)
 
-class BeantxsOp_ConnectorOperator(Operator):
+class BtxsOp_ConnectorOperator(Operator):
 
     @classmethod
     def poll(cls, context):
@@ -27,7 +27,7 @@ class BeantxsOp_ConnectorOperator(Operator):
         except AttributeError:
             return False
 
-class BeantxsOp_NewConnectorItem(BeantxsOp_ConnectorOperator):
+class BtxsOp_NewConnectorItem(BtxsOp_ConnectorOperator):
     """Add a new connector item"""
     bl_label = "Add Connector Item"
     bl_idname = "beantextures.connector_add"
@@ -36,7 +36,7 @@ class BeantxsOp_NewConnectorItem(BeantxsOp_ConnectorOperator):
         add_new_connector_item(context, "New Connector Item")
         return {'FINISHED'}
 
-class BeantxsOp_RemoveSelectedConnectorItem(BeantxsOp_ConnectorOperator):
+class BtxsOp_RemoveSelectedConnectorItem(BtxsOp_ConnectorOperator):
     """Remove selected connector item"""
     bl_label = "Remove Connector Item"
     bl_idname = "beantextures.connector_remove"
@@ -51,8 +51,8 @@ class BeantxsOp_RemoveSelectedConnectorItem(BeantxsOp_ConnectorOperator):
         remove_connector_item(context, connector.active_connector_idx)
         return {'FINISHED'}
 
-class BeantxsOp__RemoveAllConnector(BeantxsOp_ConnectorOperator):
-    """Remoev all connector items"""
+class BtxsOp__RemoveAllConnector(BtxsOp_ConnectorOperator):
+    """Remove all connector items"""
     bl_label = "Clear connector items"
     bl_idname = "beantextures.connector_remove_all"
 
@@ -76,11 +76,11 @@ class BeantxsOp__RemoveAllConnector(BeantxsOp_ConnectorOperator):
         return wm.invoke_props_dialog(self)
 
 def register():
-    bpy.utils.register_class(BeantxsOp_NewConnectorItem)
-    bpy.utils.register_class(BeantxsOp_RemoveSelectedConnectorItem)
-    bpy.utils.register_class(BeantxsOp__RemoveAllConnector)
+    bpy.utils.register_class(BtxsOp_NewConnectorItem)
+    bpy.utils.register_class(BtxsOp_RemoveSelectedConnectorItem)
+    bpy.utils.register_class(BtxsOp__RemoveAllConnector)
 
 def unregister():
-    bpy.utils.unregister_class(BeantxsOp_NewConnectorItem)
-    bpy.utils.unregister_class(BeantxsOp_RemoveSelectedConnectorItem)
-    bpy.utils.unregister_class(BeantxsOp__RemoveAllConnector)
+    bpy.utils.unregister_class(BtxsOp_NewConnectorItem)
+    bpy.utils.unregister_class(BtxsOp_RemoveSelectedConnectorItem)
+    bpy.utils.unregister_class(BtxsOp__RemoveAllConnector)

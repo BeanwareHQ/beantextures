@@ -3,7 +3,7 @@
 import bpy
 from bpy.types import Operator
 from bpy_extras import image_utils
-from beantextures.props_settings import Beantxs_LinkItem, Beantxs_ConfigEntry
+from beantextures.props_settings import Btxs_LinkItem, Btxs_ConfigEntry
 
 def add_new_config(context, name: str):
     settings = context.scene.beantextures_settings
@@ -19,7 +19,7 @@ def remove_config(context, idx: int):
 
     settings.configs.remove(idx)
 
-def add_new_link(context) -> Beantxs_LinkItem:
+def add_new_link(context) -> Btxs_LinkItem:
     settings = context.scene.beantextures_settings
     config_idx = settings.active_config_idx
     config = settings.configs[config_idx]
@@ -69,7 +69,7 @@ def purge_image(context, img: bpy.types.Image):
     if img and img.users == 0:
         context.blend_data.images.remove(img)
 
-def delete_all_links(context, config: Beantxs_ConfigEntry, purge_images: bool):
+def delete_all_links(context, config: Btxs_ConfigEntry, purge_images: bool):
     for _ in range(0, len(config.links)):
         img = config.links[0].img
         config.links.remove(0)
@@ -78,7 +78,7 @@ def delete_all_links(context, config: Beantxs_ConfigEntry, purge_images: bool):
 
 # Operator Classes
 
-class BeantxsOp_NewNodeGroup(Operator):
+class BtxsOp_NewNodeGroup(Operator):
     """Add a new shader node group"""
     bl_label = "Add New Node Group"
     bl_idname = "beantextures.new_node_group"
@@ -95,7 +95,7 @@ class BeantxsOp_NewNodeGroup(Operator):
         self.report({'INFO'}, f"Added node group '{obj.name}'")
         return {'FINISHED'}
 
-class BeantxsOp_NewConfig(Operator):
+class BtxsOp_NewConfig(Operator):
     """Add a new configuration entry"""
     bl_label = "Add Configuration"
     bl_idname = "beantextures.new_config"
@@ -108,7 +108,7 @@ class BeantxsOp_NewConfig(Operator):
         add_new_config(context, "New Config")
         return {'FINISHED'}
 
-class BeantxsOp_RemoveSelectedConfig(Operator):
+class BtxsOp_RemoveSelectedConfig(Operator):
     """Remove selected configuration"""
     bl_label = "Remove Configuration"
     bl_idname = "beantextures.remove_config"
@@ -122,7 +122,7 @@ class BeantxsOp_RemoveSelectedConfig(Operator):
         remove_config(context, idx)
         return {'FINISHED'}
 
-class BeantxsOp_RemoveAllConfigs(Operator):
+class BtxsOp_RemoveAllConfigs(Operator):
     """Remove all configurations"""
     bl_label = "Clear Configurations"
     bl_idname = "beantextures.remove_all_configs"
@@ -145,7 +145,7 @@ class BeantxsOp_RemoveAllConfigs(Operator):
         bpy.context.area.tag_redraw()
         return wm.invoke_props_dialog(self)
 
-class BeantxsOp_NewLink(Operator):
+class BtxsOp_NewLink(Operator):
     """Add a new link to the active configuration"""
     bl_label = "New Link"
     bl_idname = "beantextures.new_link"
@@ -158,7 +158,7 @@ class BeantxsOp_NewLink(Operator):
         add_new_link(context)
         return {'FINISHED'}
 
-class BeantxsOp_RemoveLink(Operator):
+class BtxsOp_RemoveLink(Operator):
     """Remove selected link from the active configuration"""
     bl_label = "Remove Link"
     bl_idname = "beantextures.remove_link"
@@ -175,7 +175,7 @@ class BeantxsOp_RemoveLink(Operator):
         remove_link(context, config.active_link_idx)
         return {'FINISHED'}
 
-class BeantxsOp_AutoImportImages(Operator):
+class BtxsOp_AutoImportImages(Operator):
     """Automatically import image(s) as link(s)"""
     bl_label = "Import Image(s)"
     bl_idname = "beantextures.auto_import_images"
@@ -202,7 +202,7 @@ class BeantxsOp_AutoImportImages(Operator):
         wm.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
-class BeantxsOp_ClearLinks(Operator):
+class BtxsOp_ClearLinks(Operator):
     """Clear all links from active configuration"""
     bl_label = "Clear Defined Links"
     bl_idname = "beantextures.clear_links"
@@ -232,21 +232,21 @@ class BeantxsOp_ClearLinks(Operator):
         return wm.invoke_props_dialog(self)
 
 def register():
-    bpy.utils.register_class(BeantxsOp_NewNodeGroup) 
-    bpy.utils.register_class(BeantxsOp_NewConfig) 
-    bpy.utils.register_class(BeantxsOp_NewLink) 
-    bpy.utils.register_class(BeantxsOp_RemoveLink) 
-    bpy.utils.register_class(BeantxsOp_RemoveSelectedConfig) 
-    bpy.utils.register_class(BeantxsOp_RemoveAllConfigs) 
-    bpy.utils.register_class(BeantxsOp_AutoImportImages) 
-    bpy.utils.register_class(BeantxsOp_ClearLinks) 
+    bpy.utils.register_class(BtxsOp_NewNodeGroup) 
+    bpy.utils.register_class(BtxsOp_NewConfig) 
+    bpy.utils.register_class(BtxsOp_NewLink) 
+    bpy.utils.register_class(BtxsOp_RemoveLink) 
+    bpy.utils.register_class(BtxsOp_RemoveSelectedConfig) 
+    bpy.utils.register_class(BtxsOp_RemoveAllConfigs) 
+    bpy.utils.register_class(BtxsOp_AutoImportImages) 
+    bpy.utils.register_class(BtxsOp_ClearLinks) 
 
 def unregister():
-    bpy.utils.unregister_class(BeantxsOp_NewNodeGroup)
-    bpy.utils.unregister_class(BeantxsOp_NewConfig) 
-    bpy.utils.unregister_class(BeantxsOp_NewLink) 
-    bpy.utils.unregister_class(BeantxsOp_RemoveLink) 
-    bpy.utils.unregister_class(BeantxsOp_RemoveSelectedConfig) 
-    bpy.utils.unregister_class(BeantxsOp_RemoveAllConfigs) 
-    bpy.utils.unregister_class(BeantxsOp_AutoImportImages) 
-    bpy.utils.unregister_class(BeantxsOp_ClearLinks) 
+    bpy.utils.unregister_class(BtxsOp_NewNodeGroup)
+    bpy.utils.unregister_class(BtxsOp_NewConfig) 
+    bpy.utils.unregister_class(BtxsOp_NewLink) 
+    bpy.utils.unregister_class(BtxsOp_RemoveLink) 
+    bpy.utils.unregister_class(BtxsOp_RemoveSelectedConfig) 
+    bpy.utils.unregister_class(BtxsOp_RemoveAllConfigs) 
+    bpy.utils.unregister_class(BtxsOp_AutoImportImages) 
+    bpy.utils.unregister_class(BtxsOp_ClearLinks) 
