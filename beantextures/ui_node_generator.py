@@ -1,4 +1,4 @@
-"""UI Interface for the node generator."""
+"""User interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
 from beantextures.ops_settings import BeantxsOp_NewNodeGroup

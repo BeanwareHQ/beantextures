@@ -436,7 +436,7 @@ class BeantxsOp_GenerateNode(Operator):
     def draw(self, context):
         layout = self.layout
         column = layout.column()
-        column.label(icon='INFO', text="Checking validity of links..")
+        #column.label(icon='INFO', text="Checking validity of links..")
 
         settings = context.scene.beantextures_settings
         config = settings.configs[settings.active_config_idx]
@@ -458,9 +458,9 @@ class BeantxsOp_GenerateNode(Operator):
         if len(config.links) == 0:
             # TODO: if more config checking is needed, consider making a separate function that
             # does something similar to check_warnings_<type>
-            errors.update({'Config': ["There is no link available."]})
+            errors.update({'configuration': ["There is no link available."]})
         for link in config.links:
-            errors.update({link.name: warning_checker(context, link, config)})
+            errors.update({f"link 'link.name'": warning_checker(context, link, config)})
 
         err_detected = False
         for err_key in errors.keys():
@@ -468,7 +468,7 @@ class BeantxsOp_GenerateNode(Operator):
                 continue
             err_detected = True
             box = layout.box()
-            box.label(text=f"On link '{err_key}':")
+            box.label(text=f"On {err_key}:")
             for err_msg in errors[err_key]:
                 box.label(icon='DOT', text=err_msg)
 
@@ -491,7 +491,7 @@ class BeantxsOp_GenerateNode(Operator):
             case 'ENUM':
                 EnumNodeTreeBuilder(config)
 
-        self.report({'INFO'}, f"Generated tree for node group '{config.name}'")
+        self.report({'INFO'}, f"Generated tree with config '{config.name}'")
         return {'FINISHED'}
 
     def invoke(self, context, event):

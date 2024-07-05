@@ -115,7 +115,7 @@ class BeantxsOp_RemoveSelectedConfig(Operator):
 
     @classmethod
     def poll(cls, context):
-        return True
+        return (len(context.scene.beantextures_settings.configs) > 0)
 
     def execute(self, context):
         idx = context.scene.beantextures_settings.active_config_idx
@@ -129,7 +129,7 @@ class BeantxsOp_RemoveAllConfigs(Operator):
 
     @classmethod
     def poll(cls, context):
-        return True
+        return (len(context.scene.beantextures_settings.configs) > 0)
 
     def execute(self, context):
         settings = context.scene.beantextures_settings
