@@ -182,7 +182,6 @@ class BtxsOp_IV_OT_icons_set(bpy.types.Operator):
     bl_idname = "beantextures.icon_set"
     bl_label = "Icon Selector"
     bl_description = "Select an icon for a connector item"
-    bl_property = "filter_auto_focus"
 
     instance = None
 

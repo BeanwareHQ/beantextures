@@ -31,7 +31,7 @@ def update_valid_nodes_list(self, context):
 class Btxs_ConnectorValidNode(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty()
 
-class Btx_ConnectorInstance(bpy.types.PropertyGroup):
+class Btxs_ConnectorInstance(bpy.types.PropertyGroup):
     valid_nodes: bpy.props.CollectionProperty(type=Btxs_ConnectorValidNode)
     material: bpy.props.PointerProperty(type=bpy.types.Material, name="Material Selection", description="Location of target node group instance", update=update_valid_nodes_list)
     name: bpy.props.StringProperty()
@@ -42,18 +42,18 @@ class Btx_ConnectorInstance(bpy.types.PropertyGroup):
 
 
 class Btxs_Connector(bpy.types.PropertyGroup):
-    connectors: bpy.props.CollectionProperty(type=Btx_ConnectorInstance, name="Connector Items")
+    connectors: bpy.props.CollectionProperty(type=Btxs_ConnectorInstance, name="Connector Items")
     active_connector_idx: bpy.props.IntProperty(name="Index of Active Connector Item")
     menu_type: bpy.props.EnumProperty(items=beantextures_connector_menu_types, name="Menu Type", default='LIST')
 
 def register():
     bpy.utils.register_class(Btxs_ConnectorValidNode)
-    bpy.utils.register_class(Btx_ConnectorInstance)
+    bpy.utils.register_class(Btxs_ConnectorInstance)
     bpy.utils.register_class(Btxs_Connector)
 
     bpy.types.Bone.beantextures_connector = bpy.props.PointerProperty(type=Btxs_Connector)
 
 def unregister():
     bpy.utils.unregister_class(Btxs_ConnectorValidNode)
-    bpy.utils.unregister_class(Btx_ConnectorInstance)
+    bpy.utils.unregister_class(Btxs_ConnectorInstance)
     bpy.utils.unregister_class(Btxs_Connector)

@@ -1,9 +1,9 @@
 """Operators used to configure connector items."""
 import bpy
 from bpy.types import Operator
-from beantextures.connector.props import Btx_ConnectorInstance, update_valid_nodes_list
+from beantextures.connector.props import Btxs_ConnectorInstance, update_valid_nodes_list
 
-def add_new_connector_item(context, name: str) -> Btx_ConnectorInstance:
+def add_new_connector_item(context, name: str) -> Btxs_ConnectorInstance:
     connector = context.active_bone.beantextures_connector
     item = connector.connectors.add()
     item.name = name
