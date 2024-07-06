@@ -21,12 +21,13 @@ class BtxsOp_ListMenu(bpy.types.Operator):
         layout.use_property_split = True
         col = layout.column()
         connector: list[Btxs_ConnectorInstance] = context.active_bone.beantextures_connector
+        connectors_sorted = sorted(connector.connectors, key=lambda x: x.menu_index)
         available = False
 
         col.label(text="Beantextures Nodes Control")
         col.separator()
 
-        for item in connector.connectors:
+        for item in connectors_sorted:
             if (item.material is not None) and item.material.use_nodes and item.show:
                 if "Value" in item.material.node_tree.nodes[item.node_name].inputs:
                     available = True
@@ -36,7 +37,7 @@ class BtxsOp_ListMenu(bpy.types.Operator):
                     row.prop(item.material.node_tree.nodes[item.node_name].inputs["Value"], "default_value", icon=item.icon, text=item.name)
 
         if not available:
-            col.label(text="No connector items available.", icon='INFO')
+            col.label(text="No connector item available.", icon='INFO')
 
     def execute(self, context):
         return {'FINISHED'}

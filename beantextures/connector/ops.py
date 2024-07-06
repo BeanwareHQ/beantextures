@@ -7,6 +7,7 @@ def add_new_connector_item(context, name: str) -> Btxs_ConnectorInstance:
     connector = context.active_bone.beantextures_connector
     item = connector.connectors.add()
     item.name = name
+    item.menu_index = len(connector.connectors) - 1
     connector.active_connector_idx = len(connector.connectors) - 1
     return item
 
