@@ -161,7 +161,7 @@ class BtxsOp_IV_OT_icon_select(bpy.types.Operator):
         # FIXME: wonky
         try:
             connector.connectors[connector.active_connector_idx]
-        except IndexError:
+        except:
             return False
         return (context.active_bone is not None)
 
@@ -191,7 +191,7 @@ class BtxsOp_IV_OT_icons_set(bpy.types.Operator):
         # FIXME: wonky
         try:
             connector.connectors[connector.active_connector_idx]
-        except IndexError:
+        except:
             return False
         return (context.active_bone is not None)
 

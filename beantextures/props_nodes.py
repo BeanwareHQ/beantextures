@@ -6,7 +6,8 @@ from beantextures.props_settings import beantextures_link_type
 def generate_linking_enum_items(self: bpy.types.ShaderNodeGroup, context):
     """Used by node group instances. This function returns a list of enum items based on the respecting node tree's (not the instance itself!) `enum_items` property."""
     items = self.node_tree.beantextures_props.enum_items
-    return [(item.name.upper(), item.name, item.name, item.idx) for item in items]
+    # BUG: putting `item.name` as the description turns all the tooltips gibberish ...
+    return [(str(item.idx), item.name, "Select item", item.idx) for item in items]
 
 class Btxs_EnumItem(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Enum item name", description="Human-readable name assigned by user")

@@ -231,6 +231,30 @@ class BtxsOp_ClearLinks(Operator):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
+class BtxsOp_InitializeEnum(Operator):
+    """Initialize driver for an enum Beantextures node"""
+    bl_label = "Add Driver"
+    bl_idname = "beantextures.init_enum_driver"
+
+    @classmethod
+    def poll(cls, context) -> bool:
+        return ((context.area.type == 'NODE_EDITOR') and hasattr(context, "active_node") and hasattr(context, "material"))
+
+    def execute(self, context):
+        node = context.active_node
+        material = context.material
+        driver = node.inputs['Value'].driver_remove("default_value")
+        driver = node.inputs['Value'].driver_add("default_value")
+        driver.driver.type = 'AVERAGE'
+
+        var = driver.driver.variables.new()
+        var.name = "enum_item"
+        var.targets[0].id_type = 'MATERIAL'
+        var.targets[0].id = material
+        var.targets[0].data_path = f"node_tree.nodes[\"{node.name}\"].beantxs_enum_prop"
+
+        return {'FINISHED'}
+
 def register():
     bpy.utils.register_class(BtxsOp_NewNodeGroup) 
     bpy.utils.register_class(BtxsOp_NewConfig) 
@@ -240,6 +264,7 @@ def register():
     bpy.utils.register_class(BtxsOp_RemoveAllConfigs) 
     bpy.utils.register_class(BtxsOp_AutoImportImages) 
     bpy.utils.register_class(BtxsOp_ClearLinks) 
+    bpy.utils.register_class(BtxsOp_InitializeEnum) 
 
 def unregister():
     bpy.utils.unregister_class(BtxsOp_NewNodeGroup)
@@ -250,3 +275,4 @@ def unregister():
     bpy.utils.unregister_class(BtxsOp_RemoveAllConfigs) 
     bpy.utils.unregister_class(BtxsOp_AutoImportImages) 
     bpy.utils.unregister_class(BtxsOp_ClearLinks) 
+    bpy.utils.unregister_class(BtxsOp_InitializeEnum) 

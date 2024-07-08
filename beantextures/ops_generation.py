@@ -87,6 +87,7 @@ class BtxsNodeTreeBuilder:
         node.nodes.clear()
         node.interface.clear()
         node.is_beantextures = True # type: ignore
+        node.beantextures_props.link_type = config.linking_type
         return node
 
     def add_io_sockets(self, config, node: NodeTree):
@@ -377,6 +378,16 @@ class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
         self.enum_idx = 0
         super().__init__(config)
 
+    def init_node_tree(self, config) -> NodeTree:
+        """Clear node tree and mark it as a Beantextures-generated node tree."""
+        node: NodeTree = config.target_node_tree
+        node.nodes.clear()
+        node.interface.clear()
+        node.is_beantextures = True # type: ignore
+        node.beantextures_props.link_type = config.linking_type
+        node.beantextures_props.enum_items.clear()
+        return node
+
     def add_io_sockets(self, config, node: NodeTree):
         """Add the base input and output sockets for the node tree."""
         node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
@@ -422,6 +433,10 @@ class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
         self.enum_idx += 1
         return (gt_node, lt_node, mult_node, prev_mix_inputs_loc)
 
+    def setup_node_tree_attributes(self, config, node):
+        node.interface.items_tree['Value'].default_value = 0 # type: ignore
+        node.interface.items_tree['Value'].subtype = 'FACTOR'
+
 class BtxsOp_GenerateNode(Operator):
     """Generate node tree using active configuration"""
     bl_label = "Generate Node Tree"
@@ -441,7 +456,6 @@ class BtxsOp_GenerateNode(Operator):
     def draw(self, context):
         layout = self.layout
         column = layout.column()
-        #column.label(icon='INFO', text="Checking validity of links..")
 
         settings = context.scene.beantextures_settings
         config = settings.configs[settings.active_config_idx]

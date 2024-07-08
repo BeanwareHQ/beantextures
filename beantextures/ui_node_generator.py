@@ -1,7 +1,7 @@
 """User interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
-from beantextures.ops_settings import BtxsOp_NewNodeGroup
+from beantextures.ops_settings import BtxsOp_NewNodeGroup, BtxsOp_InitializeEnum
 from beantextures.props_settings import Btxs_LinkItem, Btxs_ConfigEntry
 
 # Helper functions
@@ -211,7 +211,7 @@ class BEANTEXTURES_UL_LinksListRenderer(UIList):
             layout.label(text="", icon_value=icon)
 
 class LinksPanel(BeantexturesNodePanel):
-    bl_idname = "BEANTEXTURES_PT_LINKS"
+    bl_idname = "BEANTEXTURES_PT_links"
     bl_label = "Links"
     bl_parent_id = "BEANTEXTURES_PT_configs"
 
@@ -281,6 +281,33 @@ class LinksPanel(BeantexturesNodePanel):
         except IndexError:
             return
 
+class InspectorPanel(BeantexturesNodePanel):
+    bl_idname = "BEANTEXTURES_PT_inspector"
+    bl_label = "Inspector"
+
+    @classmethod
+    def poll(cls, context):
+        return ((context.area.type == 'NODE_EDITOR') and isinstance(context.active_node, bpy.types.ShaderNode))
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = False
+        col = layout.column()
+
+        node = context.active_node
+        col.prop(node, "name", text=f"Active node", icon='NODE')
+
+        if not (isinstance(node, bpy.types.ShaderNodeGroup) and hasattr(node.node_tree, "beantextures_props") and hasattr(node.node_tree.beantextures_props, "link_type")):
+            layout.label(text="Not a Beantextures node.", icon='INFO')
+            return
+
+        # TODO: maybe use a more descriptive name
+        col.label(text=f"Linking type: {node.node_tree.beantextures_props.link_type}")
+
+        if node.node_tree.beantextures_props.link_type == 'ENUM':
+            col.prop(node, "beantxs_enum_prop", text="Enum selection")
+            col.separator()
+            col.operator(BtxsOp_InitializeEnum.bl_idname, text="Add Driver", icon='DRIVER')
 
 def register():
     bpy.utils.register_class(BEANTEXTURES_UL_ConfigsListRenderer)
@@ -288,6 +315,7 @@ def register():
     bpy.utils.register_class(NodeTreePanel)
     bpy.utils.register_class(ConfigsPanel)
     bpy.utils.register_class(LinksPanel)
+    bpy.utils.register_class(InspectorPanel)
 
 def unregister():
     bpy.utils.unregister_class(BEANTEXTURES_UL_ConfigsListRenderer)
@@ -295,3 +323,4 @@ def unregister():
     bpy.utils.unregister_class(NodeTreePanel)
     bpy.utils.unregister_class(ConfigsPanel)
     bpy.utils.unregister_class(LinksPanel)
+    bpy.utils.unregister_class(InspectorPanel)

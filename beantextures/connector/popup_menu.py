@@ -29,12 +29,16 @@ class BtxsOp_ListMenu(bpy.types.Operator):
 
         for item in connectors_sorted:
             if (item.material is not None) and item.material.use_nodes and item.show:
-                if "Value" in item.material.node_tree.nodes[item.node_name].inputs:
+                if (item.node_name in item.material.node_tree.nodes) and ("Value" in item.material.node_tree.nodes[item.node_name].inputs):
                     available = True
                     row = col.row()
                     row.alignment = 'EXPAND'
                     row.label(text="", icon=item.icon)
-                    row.prop(item.material.node_tree.nodes[item.node_name].inputs["Value"], "default_value", icon=item.icon, text=item.name)
+
+                    if item.material.node_tree.nodes[item.node_name].node_tree.beantextures_props.link_type == 'ENUM':
+                        row.prop(item.material.node_tree.nodes[item.node_name], "beantxs_enum_prop", text=item.name)
+                    else:
+                        row.prop(item.material.node_tree.nodes[item.node_name].inputs["Value"], "default_value", icon=item.icon, text=item.name)
 
         if not available:
             col.label(text="No connector item available.", icon='INFO')
