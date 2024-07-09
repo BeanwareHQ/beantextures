@@ -92,14 +92,12 @@ class BtxsOp_PieMenuItem(bpy.types.Operator):
             if not hasattr(context, "item"):
                 return
 
-            if (context.item.material is not None) and context.item.material.use_nodes and context.item.show:
-                if (context.item.node_name in context.item.material.node_tree.nodes) and ("Value" in context.item.material.node_tree.nodes[context.item.node_name].inputs):
-                    row.label(text="", icon=context.item.icon)
+            row.label(text="", icon=context.item.icon)
 
-                    if context.item.material.node_tree.nodes[context.item.node_name].node_tree.beantextures_props.link_type == 'ENUM':
-                        row.prop(context.item.material.node_tree.nodes[context.item.node_name], "beantxs_enum_prop", text=context.item.name)
-                    else:
-                        row.prop(context.item.material.node_tree.nodes[context.item.node_name].inputs["Value"], "default_value", icon=context.item.icon, text=context.item.name)
+            if context.item.material.node_tree.nodes[context.item.node_name].node_tree.beantextures_props.link_type == 'ENUM':
+                row.prop(context.item.material.node_tree.nodes[context.item.node_name], "beantxs_enum_prop", text=context.item.name)
+            else:
+                row.prop(context.item.material.node_tree.nodes[context.item.node_name].inputs["Value"], "default_value", icon=context.item.icon, text=context.item.name)
 
     def execute(self, context):
         return {'FINISHED'}
@@ -134,8 +132,10 @@ class BtxsOp_PieMenu(bpy.types.Menu):
 
         for item in connectors_sorted:
             available = True
-            pie.context_pointer_set("item", item)
-            pie.operator(BtxsOp_PieMenuItem.bl_idname, text=item.name, icon=item.icon)
+
+            if (item.material is not None) and item.material.use_nodes and item.show and (item.node_name in item.material.node_tree.nodes) and ("Value" in item.material.node_tree.nodes[item.node_name].inputs):
+                pie.context_pointer_set("item", item)
+                pie.operator(BtxsOp_PieMenuItem.bl_idname, text=item.name, icon=item.icon)
 
         if not available:
             col.label(text="No connector item available.", icon='INFO')

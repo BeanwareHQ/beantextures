@@ -63,6 +63,9 @@ def auto_import_images(context, directory: bpy.types.StringProperty, files: bpy.
             link.img = image_utils.load_image(directory + file_name)
             link.name = str(prefix) + bpy.path.display_name_from_filepath(file_name) + str(suffix)
 
+def import_image(link: Btxs_LinkItem, directory: bpy.types.StringProperty, file: bpy.types.OperatorFileListElement):
+    link.img = image_utils.load_image(directory + file.name) # type: ignore
+
 def purge_image(context, img: bpy.types.Image):
     """Purge image if image has no user"""
 
@@ -195,6 +198,34 @@ class BtxsOp_AutoImportImages(Operator):
 
     def execute(self, context):
         auto_import_images(context, self.directory, self.files, self.name_prefix, self.name_suffix)
+
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        wm.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+class BtxsOp_OpenImage(Operator):
+    """Import image to link"""
+    bl_label = "Pick Image"
+    bl_idname = "beantextures.import_image"
+
+    filter_image: bpy.props.BoolProperty(default=True, options={'HIDDEN', 'SKIP_SAVE'})
+    filter_folder: bpy.props.BoolProperty(default=True, options={'HIDDEN', 'SKIP_SAVE'})
+
+    files: bpy.props.CollectionProperty(type=bpy.types.OperatorFileListElement, options={'HIDDEN', 'SKIP_SAVE'})
+    directory: bpy.props.StringProperty(maxlen=1024, subtype='FILE_PATH', options={'HIDDEN', 'SKIP_SAVE'})
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        settings = context.scene.beantextures_settings
+        config = settings.configs[settings.active_config_idx]
+        link = config.links[config.active_link_idx]
+        import_image(link, self.directory, self.files[0])
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -263,6 +294,7 @@ def register():
     bpy.utils.register_class(BtxsOp_RemoveSelectedConfig) 
     bpy.utils.register_class(BtxsOp_RemoveAllConfigs) 
     bpy.utils.register_class(BtxsOp_AutoImportImages) 
+    bpy.utils.register_class(BtxsOp_OpenImage) 
     bpy.utils.register_class(BtxsOp_ClearLinks) 
     bpy.utils.register_class(BtxsOp_InitializeEnum) 
 
@@ -274,5 +306,6 @@ def unregister():
     bpy.utils.unregister_class(BtxsOp_RemoveSelectedConfig) 
     bpy.utils.unregister_class(BtxsOp_RemoveAllConfigs) 
     bpy.utils.unregister_class(BtxsOp_AutoImportImages) 
+    bpy.utils.unregister_class(BtxsOp_OpenImage) 
     bpy.utils.unregister_class(BtxsOp_ClearLinks) 
     bpy.utils.unregister_class(BtxsOp_InitializeEnum) 

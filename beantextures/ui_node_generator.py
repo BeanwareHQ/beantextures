@@ -1,7 +1,7 @@
 """User interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
-from beantextures.ops_settings import BtxsOp_NewNodeGroup, BtxsOp_InitializeEnum
+from beantextures.ops_settings import BtxsOp_ClearLinks, BtxsOp_NewNodeGroup, BtxsOp_InitializeEnum, BtxsOp_OpenImage, BtxsOp_NewLink, BtxsOp_RemoveLink, BtxsOp_RemoveAllConfigs
 from beantextures.props_settings import Btxs_LinkItem, Btxs_ConfigEntry
 
 # Helper functions
@@ -229,11 +229,11 @@ class LinksPanel(BeantexturesNodePanel):
             layout.use_property_split = True
 
             col = row.column(align=True)
-            col.operator("beantextures.new_link", icon='ADD', text="")
-            col.operator("beantextures.remove_link", icon='REMOVE', text="")
+            col.operator(BtxsOp_NewLink.bl_idname, icon='ADD', text="")
+            col.operator(BtxsOp_RemoveLink.bl_idname, icon='REMOVE', text="")
             col.separator()
-            col.operator("beantextures.clear_links", icon='X', text="")
-            col.operator("beantextures.auto_import_images", icon='FILE_FOLDER', text="")
+            col.operator(BtxsOp_RemoveAllConfigs.bl_idname, icon='X', text="")
+            col.operator(BtxsOp_ClearLinks.bl_idname, icon='FILE_FOLDER', text="")
 
             layout.use_property_split = True
             col = layout.column()
@@ -276,7 +276,9 @@ class LinksPanel(BeantexturesNodePanel):
                 case _:
                     return
                     
-            col.prop(active_link, "img", text="Image")
+            row = col.row()
+            row.prop(active_link, "img", text="Image")
+            row.operator(BtxsOp_OpenImage.bl_idname, text="", icon='FILE_FOLDER')
 
         except IndexError:
             return
