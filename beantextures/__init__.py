@@ -21,7 +21,7 @@ if "bpy" in locals():
 
 else:
     from . import ops_settings, props_nodes, props_settings, ui_node_generator, ops_generation
-    from .connector import props, ui, ops, icon_picker, popup_menu
+    from .connector import props, ui, ops, icon_picker, popup_menu, panel
 
 def register():
     ops_settings.register()
@@ -35,6 +35,7 @@ def register():
     ops.register()
     icon_picker.register()
     popup_menu.register()
+    panel.register()
 
 def unregister():
     ops_settings.unregister()
@@ -48,6 +49,7 @@ def unregister():
     ops.unregister()
     icon_picker.unregister()
     popup_menu.unregister()
+    panel.unregister()
 
 
 if __name__ == "__main__":

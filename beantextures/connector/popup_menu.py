@@ -1,47 +1,53 @@
 """Definition of popup menus used to display the `Value` input of a Beantextures node."""
 import bpy
+from bpy.types import UILayout
 from beantextures.connector.props import Btxs_ConnectorInstance, update_valid_nodes_list
+
+def list_draw(self, context, layout: UILayout, label: bool = False):
+    layout = layout
+    layout.use_property_split = True
+    col = layout.column()
+    connector: list[Btxs_ConnectorInstance] = context.active_bone.beantextures_connector
+    connectors_sorted: list[Btxs_ConnectorInstance] = sorted(connector.connectors, key=lambda x: x.menu_index)
+    available = False
+
+    if label:
+        col.label(text="Beantextures Nodes Control")
+        col.separator()
+
+    for item in connectors_sorted:
+        if (item.material is not None) and item.material.use_nodes and item.show:
+            if (item.node_name in item.material.node_tree.nodes) and ("Value" in item.material.node_tree.nodes[item.node_name].inputs):
+                available = True
+                row = col.row()
+                row.alignment = 'EXPAND'
+                row.label(text="", icon=item.icon)
+
+                if item.material.node_tree.nodes[item.node_name].node_tree.beantextures_props.link_type == 'ENUM':
+                    row.prop(item.material.node_tree.nodes[item.node_name], "beantxs_enum_prop", text=item.name)
+                else:
+                    row.prop(item.material.node_tree.nodes[item.node_name].inputs["Value"], "default_value", icon=item.icon, text=item.name)
+
+    if not available:
+        col.label(text="No connector item available.", icon='INFO')
+
 
 class BtxsOp_ListMenu(bpy.types.Operator):
     """Show properties of Beantexture nodes on active bone as a list"""
     bl_label = "Display Beantextures Props List"
-    # WARNING: does bl_idname *force* you to have a predefined Blender ID (`pose` here) so it can be keymappable?
+    # WARNING: does bl_idname *force* you to have a predefined Blender ID (`pose` here) so it can be assigned a keybind?
     bl_idname = "pose.connector_popup_list_show"
     bl_options = {'INTERNAL'}
 
     @classmethod
     def poll(cls, context):
         try:
-            return bool(context.active_bone and context.mode == 'POSE')
+            return (hasattr(context, "active_bone") and context.mode == 'POSE')
         except AttributeError:
             return False
 
     def draw(self, context):
-        layout = self.layout
-        layout.use_property_split = True
-        col = layout.column()
-        connector: list[Btxs_ConnectorInstance] = context.active_bone.beantextures_connector
-        connectors_sorted = sorted(connector.connectors, key=lambda x: x.menu_index)
-        available = False
-
-        col.label(text="Beantextures Nodes Control")
-        col.separator()
-
-        for item in connectors_sorted:
-            if (item.material is not None) and item.material.use_nodes and item.show:
-                if (item.node_name in item.material.node_tree.nodes) and ("Value" in item.material.node_tree.nodes[item.node_name].inputs):
-                    available = True
-                    row = col.row()
-                    row.alignment = 'EXPAND'
-                    row.label(text="", icon=item.icon)
-
-                    if item.material.node_tree.nodes[item.node_name].node_tree.beantextures_props.link_type == 'ENUM':
-                        row.prop(item.material.node_tree.nodes[item.node_name], "beantxs_enum_prop", text=item.name)
-                    else:
-                        row.prop(item.material.node_tree.nodes[item.node_name].inputs["Value"], "default_value", icon=item.icon, text=item.name)
-
-        if not available:
-            col.label(text="No connector item available.", icon='INFO')
+        list_draw(self, context, self.layout, label=True)
 
     def execute(self, context):
         return {'FINISHED'}
@@ -60,6 +66,81 @@ class BtxsOp_ListMenu(bpy.types.Operator):
         # HACK: this doesn't seem right..
         return wm.invoke_popup(self, width=350)
 
+class BtxsOp_PieMenuItem(bpy.types.Operator):
+    """Show properties of Beantexture nodes on active bone as a list"""
+    bl_label = "Display Beantextures Props List"
+    bl_idname = "beantextures.show_pie_menu_item"
+    bl_options = {'INTERNAL'}
+
+    # should be passed by UILayout.context_pointer_set(...) as context.item, see below
+    # item: bpy.props.PointerProperty(type=BtxsConnectorInstance)
+
+    @classmethod
+    def poll(cls, context):
+        try:
+            return (hasattr(context, "active_bone") and context.mode == 'POSE' and hasattr(context, "item"))
+        except AttributeError:
+            return False
+
+    def draw(self, context):
+        # try:
+            layout = self.layout
+            row = layout.row()
+            row.alignment = 'EXPAND'
+
+            # TODO: context.item keeps disappearing!
+            if not hasattr(context, "item"):
+                return
+
+            if (context.item.material is not None) and context.item.material.use_nodes and context.item.show:
+                if (context.item.node_name in context.item.material.node_tree.nodes) and ("Value" in context.item.material.node_tree.nodes[context.item.node_name].inputs):
+                    row.label(text="", icon=context.item.icon)
+
+                    if context.item.material.node_tree.nodes[context.item.node_name].node_tree.beantextures_props.link_type == 'ENUM':
+                        row.prop(context.item.material.node_tree.nodes[context.item.node_name], "beantxs_enum_prop", text=context.item.name)
+                    else:
+                        row.prop(context.item.material.node_tree.nodes[context.item.node_name].inputs["Value"], "default_value", icon=context.item.icon, text=context.item.name)
+
+    def execute(self, context):
+        return {'FINISHED'}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        bpy.context.area.tag_redraw()
+
+        # HACK: this doesn't seem right..
+        return wm.invoke_popup(self, width=350)
+
+class BtxsOp_PieMenu(bpy.types.Menu):
+    """Show properties of Beantexture nodes on active bone as a pie menu"""
+    bl_label = "Beantextures Props List"
+    bl_idname = "BEANTEXTURES_MT_pie_menu"
+
+    @classmethod
+    def poll(cls, context):
+        try:
+            return (hasattr(context, "active_bone") and context.mode == 'POSE')
+        except AttributeError:
+            return False
+
+    def draw(self, context):
+        layout = self.layout
+        pie = layout.menu_pie()
+        layout = layout
+        layout.use_property_split = True
+        connector: list[Btxs_ConnectorInstance] = context.active_bone.beantextures_connector
+        connectors_sorted: list[Btxs_ConnectorInstance] = sorted(connector.connectors, key=lambda x: x.menu_index)
+        available = False
+
+        for item in connectors_sorted:
+            available = True
+            pie.context_pointer_set("item", item)
+            pie.operator(BtxsOp_PieMenuItem.bl_idname, text=item.name, icon=item.icon)
+
+        if not available:
+            col.label(text="No connector item available.", icon='INFO')
+
+
 class BtxsOp_ShowMenu(bpy.types.Operator):
     """Show properties of Beantexture nodes on active bone"""
     bl_label = "Display Beantextures Props"
@@ -68,7 +149,7 @@ class BtxsOp_ShowMenu(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         try:
-            return bool(context.active_bone and context.mode == 'POSE')
+            return (hasattr(context, "active_bone") and context.mode == 'POSE')
         except AttributeError:
             return False
     
@@ -80,14 +161,16 @@ class BtxsOp_ShowMenu(bpy.types.Operator):
                 # FIXME: don't hardcode?
                 bpy.ops.pose.connector_popup_list_show('INVOKE_DEFAULT')
             case 'PIE':
-                print("unimplemented")
-            
+                bpy.ops.wm.call_menu_pie(name=BtxsOp_PieMenu.bl_idname)
+
         return {'FINISHED'}
 
 addon_keymaps = [] 
 
 def register():
     bpy.utils.register_class(BtxsOp_ListMenu)
+    bpy.utils.register_class(BtxsOp_PieMenuItem)
+    bpy.utils.register_class(BtxsOp_PieMenu)
     bpy.utils.register_class(BtxsOp_ShowMenu)
 
     wm = bpy.context.window_manager
@@ -99,6 +182,8 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(BtxsOp_ListMenu)
+    bpy.utils.unregister_class(BtxsOp_PieMenuItem)
+    bpy.utils.unregister_class(BtxsOp_PieMenu)
     bpy.utils.unregister_class(BtxsOp_ShowMenu)
 
     wm = bpy.context.window_manager
