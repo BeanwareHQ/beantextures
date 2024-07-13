@@ -25,7 +25,7 @@ class BtxsOp_ConnectorOperator(Operator):
     def poll(cls, context):
         try:
             return bool(context.active_bone and context.mode == 'POSE' and context.active_bone.beantextures_connector)
-        except AttributeError:
+        except AttributeError and IndexError:
             return False
 
 class BtxsOp_NewConnectorItem(BtxsOp_ConnectorOperator):
@@ -81,18 +81,28 @@ class BtxsOp_ReloadNodeNames(BtxsOp_ConnectorOperator):
     bl_label = "Reload List"
     bl_idname = "beantextures.connector_reload_group_list"
 
-    @classmethod
-    def poll(cls, context):
-        connector = context.active_bone.beantextures_connector
-        try:
-            return bool(context.active_bone and context.mode == 'POSE' and connector.connectors[connector.active_connector_idx])
-        except AttributeError:
-            return False
-
     def execute(self, context):
         connector = context.active_bone.beantextures_connector
         item = connector.connectors[connector.active_connector_idx]
         update_valid_nodes_list(item, context)
+        item.node_is_valid = True if item.node_name in item.valid_nodes else False
+        return {'FINISHED'}
+
+class BtxsOp_ReloadAllNodeNames(BtxsOp_ConnectorOperator):
+    """Reload available Beantextures node group instances across all connector items"""
+    bl_label = "Reload List"
+    bl_idname = "beantextures.connector_reload_all_group_list"
+
+    @classmethod
+    def poll(cls, context):
+        connectors = context.active_bone.beantextures_connector.connectors
+        return (super().poll(context)) and (len(connectors) > 0)
+
+    def execute(self, context):
+        connector = context.active_bone.beantextures_connector
+        for item in connector.connectors:
+            update_valid_nodes_list(item, context)
+            item.node_is_valid = True if item.node_name in item.valid_nodes else False
         return {'FINISHED'}
 
 
@@ -103,11 +113,8 @@ class BtxsOp_ModifyNodeSelection(BtxsOp_ConnectorOperator):
 
     @classmethod
     def poll(cls, context):
-        connector = context.active_bone.beantextures_connector
-        try:
-            return bool(context.active_bone and context.mode == 'POSE' and connector.connectors[connector.active_connector_idx])
-        except AttributeError:
-            return False
+        connectors = context.active_bone.beantextures_connector.connectors
+        return (super().poll(context)) and (len(connectors) > 0)
 
     def draw(self, context):
         layout = self.layout
@@ -135,6 +142,7 @@ def register():
     bpy.utils.register_class(BtxsOp_RemoveAllConnector)
     bpy.utils.register_class(BtxsOp_ModifyNodeSelection)
     bpy.utils.register_class(BtxsOp_ReloadNodeNames)
+    bpy.utils.register_class(BtxsOp_ReloadAllNodeNames)
 
 def unregister():
     bpy.utils.unregister_class(BtxsOp_NewConnectorItem)
@@ -142,3 +150,4 @@ def unregister():
     bpy.utils.unregister_class(BtxsOp_RemoveAllConnector)
     bpy.utils.unregister_class(BtxsOp_ModifyNodeSelection)
     bpy.utils.unregister_class(BtxsOp_ReloadNodeNames)
+    bpy.utils.unregister_class(BtxsOp_ReloadAllNodeNames)

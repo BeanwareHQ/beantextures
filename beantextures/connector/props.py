@@ -28,6 +28,8 @@ def update_valid_nodes_list(self, context):
             item = valid_nodes_list.add()
             item.name = node_name
 
+        self.node_is_valid = True if self.node_name in self.valid_nodes else False
+
 class Btxs_ConnectorValidNode(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty()
 
@@ -35,10 +37,11 @@ class Btxs_ConnectorInstance(bpy.types.PropertyGroup):
     valid_nodes: bpy.props.CollectionProperty(type=Btxs_ConnectorValidNode)
     material: bpy.props.PointerProperty(type=bpy.types.Material, name="Material Selection", description="Location of target node group instance", update=update_valid_nodes_list)
     name: bpy.props.StringProperty()
-    node_name: bpy.props.StringProperty(name="Node Name", description="A Beantextures node group instance to control")
+    node_name: bpy.props.StringProperty(name="Node Name", description="A Beantextures node group instance to control", update=update_valid_nodes_list)
     menu_index: bpy.props.IntProperty(name="Menu Index", description="Index of the connector item; will influence the order of the item when displayed")
     icon: bpy.props.EnumProperty(items=icons_enum, name="Icon", description="Icon used to identify the connector item", default='NODETREE')
     show: bpy.props.BoolProperty(name="Show on View3D Sidebar and Pop-up", default=True)
+    node_is_valid: bpy.props.BoolProperty(name="Whether or not the node under said name exists on the respecting material")
 
 class Btxs_Connector(bpy.types.PropertyGroup):
     connectors: bpy.props.CollectionProperty(type=Btxs_ConnectorInstance, name="Connector Items")

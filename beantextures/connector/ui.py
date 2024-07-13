@@ -2,10 +2,8 @@
 import bpy
 from bpy.types import UIList
 from beantextures.connector.icon_picker import ICONS, BtxsOp_IV_OT_icons_set
-from beantextures.connector.ops import BtxsOp_ModifyNodeSelection, BtxsOp_ReloadNodeNames
-
-def check_icon_validity(icon_name: str) -> bool:
-    return (icon_name in ICONS)
+from beantextures.connector.ops import BtxsOp_ModifyNodeSelection, BtxsOp_ReloadAllNodeNames, BtxsOp_ReloadNodeNames
+from beantextures.connector.props import update_valid_nodes_list
 
 class BEANTEXTURES_UL_ConnectorItemsListRenderer(UIList):
     """
@@ -19,7 +17,12 @@ class BEANTEXTURES_UL_ConnectorItemsListRenderer(UIList):
                     layout.operator(BtxsOp_IV_OT_icons_set.bl_idname, text="", icon=item.icon, emboss=True)
                 else:
                     layout.label(text="", icon=item.icon)
+
                 layout.prop(item, "name", text="", emboss=False)
+
+                if not item.node_is_valid:
+                    layout.label(text="", icon='ERROR')
+
                 if item.show:
                     layout.prop(item, "show", text="", emboss=False, icon='HIDE_OFF')
                 else:
@@ -81,6 +84,7 @@ class Btxs_ConnectorItemsList(bpy.types.Panel):
         col.operator("beantextures.connector_remove", icon='REMOVE', text="")
         col.separator()
         col.operator("beantextures.connector_remove_all", icon='X', text="")
+        col.operator(BtxsOp_ReloadAllNodeNames.bl_idname, text="", icon='FILE_REFRESH')
 
         try:
             layout.use_property_split = True

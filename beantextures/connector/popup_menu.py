@@ -64,7 +64,7 @@ class BtxsOp_ListMenu(bpy.types.Operator):
         bpy.context.area.tag_redraw()
 
         # HACK: this doesn't seem right..
-        return wm.invoke_popup(self, width=350)
+        return wm.invoke_popup(self)
 
 class BtxsOp_PieMenuItem(bpy.types.Operator):
     """Show selected property"""
@@ -83,10 +83,10 @@ class BtxsOp_PieMenuItem(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
+        layout.use_property_split = True
         row = layout.row()
         row.alignment = 'EXPAND'
         connector = context.active_bone.beantextures_connector
-
 
         item = connector.connectors[self.idx]
 
@@ -104,7 +104,7 @@ class BtxsOp_PieMenuItem(bpy.types.Operator):
         bpy.context.area.tag_redraw()
 
         # HACK: this doesn't seem right..
-        return wm.invoke_popup(self, width=350)
+        return wm.invoke_popup(self)
 
 class BtxsOp_PieMenu(bpy.types.Menu):
     """Show properties of Beantexture nodes on active bone as a pie menu"""
