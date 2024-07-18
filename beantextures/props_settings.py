@@ -39,6 +39,7 @@ class Btxs_GlobalSettings(bpy.types.PropertyGroup):
     node_group_adder_name: bpy.props.StringProperty(name="Node Group Name", description="Name to assign for the new group", default="Beantextures")
     configs: bpy.props.CollectionProperty(type=Btxs_ConfigEntry, name="Beantextures Configurations", description="List of stored configurations for active scene")
     active_config_idx: bpy.props.IntProperty(name="Index of Active Configuration")
+    #link_err_msg: bpy.props.Str
 
 def register():
     bpy.utils.register_class(Btxs_LinkItem)

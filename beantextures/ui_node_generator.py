@@ -1,7 +1,7 @@
 """User interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
-from beantextures.ops_settings import BtxsOp_ClearLinks, BtxsOp_NewNodeGroup, BtxsOp_InitializeEnum, BtxsOp_OpenImage, BtxsOp_NewLink, BtxsOp_RemoveLink, BtxsOp_RemoveAllConfigs
+from beantextures.ops_settings import BtxsOp_AutoImportImages, BtxsOp_ClearLinks, BtxsOp_NewNodeGroup, BtxsOp_InitializeEnum, BtxsOp_OpenImage, BtxsOp_NewLink, BtxsOp_RemoveLink, BtxsOp_RemoveAllConfigs
 from beantextures.props_settings import Btxs_LinkItem, Btxs_ConfigEntry
 
 # Helper functions
@@ -232,8 +232,8 @@ class LinksPanel(BeantexturesNodePanel):
             col.operator(BtxsOp_NewLink.bl_idname, icon='ADD', text="")
             col.operator(BtxsOp_RemoveLink.bl_idname, icon='REMOVE', text="")
             col.separator()
-            col.operator(BtxsOp_RemoveAllConfigs.bl_idname, icon='X', text="")
-            col.operator(BtxsOp_ClearLinks.bl_idname, icon='FILE_FOLDER', text="")
+            col.operator(BtxsOp_ClearLinks.bl_idname, icon='X', text="")
+            col.operator(BtxsOp_AutoImportImages.bl_idname, icon='FILE_FOLDER', text="")
 
             layout.use_property_split = True
             col = layout.column()
