@@ -21,12 +21,15 @@
 
 Beantextures does two things: **generate image switching shader node group(s)** and then **expose the image index property in pose mode**—no more than that. You still get to set up your rig the way you want it to be!
 
+<p align=center>https://github.com/user-attachments/assets/38db8269-aa31-47b1-ae58-f3462eb62e1a</p>
+
+
 <div>
 <img src="assets/node-groups.png" width=350px title="Node group instances">
 <img src="assets/pie-menu.png" width=350px title="The pie menu (under pose mode)">
 </div>
 
-Here's an example of a practical usage: ([you can get the model here](assets/been-model.zip))
+Here's an example of a more practical usage: ([you can get the model here](assets/been-model.zip))
 
 https://github.com/user-attachments/assets/1033d1a8-2745-4470-bb34-b10200795a30
 
