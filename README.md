@@ -1,7 +1,7 @@
-<div style="text-align: center;">
+<div align="center">
 
 <div>
-    <p style="font-size: xx-large; font-weight: bold; margin: 0px;">Beantextures</p>
+    <h1>Beantextures</h1>
     <p><i>2D texture controls on 3D rigs, made simple</i></p>
     
 </div>
@@ -16,12 +16,15 @@
 
 </div>
 
+
 # Overview
 
 Beantextures does two things: **generate image switching nodes** and then **expose the image index property in pose mode**—no more than that. You still get to set up your rig the way you want it to be!
 
 Here's an example of a practical usage:
 
-![Demo](demos/on-rig.mp4)
+https://github.com/user-attachments/assets/1033d1a8-2745-4470-bb34-b10200795a30
+
+
 
 
