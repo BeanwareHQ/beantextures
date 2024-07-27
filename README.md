@@ -31,6 +31,8 @@ Here's an example of a more practical usage: ([you can get the model here](asset
 https://github.com/user-attachments/assets/1033d1a8-2745-4470-bb34-b10200795a30
 
 
+# Compatibility
+Beantextures is only compatible with Blender &ge;4.0.
 # Why Beantextures?
 
 Well, it automates the actual switch node generation, with the best[^1] approach to 2D image-switching animation (mix nodes)!
@@ -64,9 +66,6 @@ At least that's it for the node group generator. But whether the node properties
 - 🏷️ Sort the order of properties as you wish
 
 </details>
-
-# To-Do's
-[Available here](TODO.md).
 
 
 [^1]: most flexible but not that performant; shouldn't be too much of an issue for most rig setups.

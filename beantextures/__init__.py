@@ -1,11 +1,11 @@
 bl_info = {
     "name": "Beantextures",
     "author": "Cikitta Tjok (daringcuteseal)",
-    "version": (1, 0, 0, 240604),
-    "blender": (4, 1, 1),
+    "version": (1, 0, 0, 270704),
+    "blender": (4, 0, 0),
     "location": "Node editor sidebar and bone properties",
     "description": "Enhance image texture-based animation workflow.",
-    "doc_url": "https://github.com/BeanwareHQ/beantextures/docs",
+    "doc_url": "https://github.com/BeanwareHQ/beantextures/wiki",
     "tracker_url": "https://github.com/BeanwareHQ/beantextures/issues",
     "category": "Animation",
 }
