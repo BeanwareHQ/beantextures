@@ -9,7 +9,7 @@
 <div><img src="assets/logo.png" width="100px"></div>
 
 <p>
-<a href="https://daringcuteseal.gumroad.com/l/beantextures">Get it!</a> &bull;
+<a href="https://github.com/BeanwareHQ/beantextures/wiki/Installation">Get it!</a> &bull;
 <a href="https://github.com/BeanwareHQ/beantextures/wiki">Wiki</a> &bull;
 <a href="https://github.com/BeanwareHQ/beantextures/wiki/Quick-Start-Guide">Quick Start</a>
 </p>
