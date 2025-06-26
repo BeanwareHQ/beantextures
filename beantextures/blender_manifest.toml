@@ -1,0 +1,36 @@
+schema_version = "1.0.0"
+
+id = "beantextures"
+version = "1.0.1"
+name = "Beantextures"
+tagline = "Addon to help with 2D texture-based animations"
+maintainer = "Daringcuteseal@BeanwareHQ"
+type = "add-on"
+
+website = "https://github.com/beanwareHQ/beantextures"
+
+tags = ["Animation", "Node", "Rigging"]
+
+blender_version_min = "4.2.0"
+
+license = [
+  "SPDX:GPL-3.0-or-later",
+]
+
+# platforms = ["windows-x64", "macos-arm64", "linux-x64"]
+# # Other supported platforms: "windows-arm64", "macos-x64"
+
+# wheels = [
+#   "./wheels/hexdump-3.3-py3-none-any.whl",
+#   "./wheels/jsmin-3.0.1-py3-none-any.whl",
+# ]
+
+[permissions]
+files = "Import image textures to generated node group"
+
+[build]
+# paths_exclude_pattern = [
+#   "__pycache__/",
+#   "/.git/",
+#   "/*.zip",
+# ]
