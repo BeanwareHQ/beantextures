@@ -85,21 +85,29 @@ class BtxsNodeTreeBuilder:
         """Clear node tree and mark it as a Beantextures-generated node tree."""
         node: NodeTree = config.target_node_tree
         node.nodes.clear()
-        node.interface.clear()
         node.is_beantextures = True # type: ignore
         node.beantextures_props.link_type = config.linking_type
         return node
 
     def add_io_sockets(self, config, node: NodeTree):
-        """Add the base input and output sockets for the node tree."""
-        node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-        node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
+        """Add the base input and output sockets for the node tree. Only adds the sockets when they don't exist already, so that the user doesn't have to reconnect nodes themselves."""
+        if not 'Value' in node.interface.items_tree:
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
+            node.interface.remove(node.interface.items_tree['Value'])
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+
+        if not 'Image' in node.interface.items_tree:
+            node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
 
         node.interface.items_tree['Value'].min_value = config.int_min # type: ignore
         node.interface.items_tree['Value'].max_value = config.int_max # type: ignore
 
-        if config.output_alpha: 
-            node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
+        if config.output_alpha:
+            if not 'Alpha' in node.interface.items_tree: 
+                node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
+        elif 'Alpha' in node.interface.items_tree:
+            node.interface.remove(node.interface.items_tree['Alpha'])
 
     def add_io_nodes(self, node: NodeTree) -> tuple[NodeGroupInput, NodeGroupOutput]:
         """Add the Group Input and Group Output nodes to the node tree."""
@@ -330,15 +338,24 @@ class FloatNodeTreeBuilder(BtxsNodeTreeBuilder):
         super().__init__(config)
 
     def add_io_sockets(self, config, node: NodeTree):
-        """Add the base input and output sockets for the node tree."""
-        node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
-        node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
+        """Add the base input and output sockets for the node tree. Only adds the sockets when they don't exist already, so that the user doesn't have to reconnect nodes themselves."""
+        if not 'Value' in node.interface.items_tree:
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketFloat):
+            node.interface.remove(node.interface.items_tree['Value'])
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
+
+        if not 'Image' in node.interface.items_tree:
+            node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
 
         node.interface.items_tree['Value'].min_value = config.float_min # type: ignore
         node.interface.items_tree['Value'].max_value = config.float_max # type: ignore
 
-        if config.output_alpha: 
-            node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
+        if config.output_alpha:
+            if not 'Alpha' in node.interface.items_tree: 
+                node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
+        elif 'Alpha' in node.interface.items_tree:
+            node.interface.remove(node.interface.items_tree['Alpha'])
 
     def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         # ShaderNodeMath is a subclass of Node
@@ -380,24 +397,30 @@ class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
 
     def init_node_tree(self, config) -> NodeTree:
         """Clear node tree and mark it as a Beantextures-generated node tree."""
+        super().init_node_tree(config)
         node: NodeTree = config.target_node_tree
-        node.nodes.clear()
-        node.interface.clear()
-        node.is_beantextures = True # type: ignore
-        node.beantextures_props.link_type = config.linking_type
         node.beantextures_props.enum_items.clear()
         return node
 
     def add_io_sockets(self, config, node: NodeTree):
-        """Add the base input and output sockets for the node tree."""
-        node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-        node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
+        """Add the base input and output sockets for the node tree. Only adds the sockets when they don't exist already, so that the user doesn't have to reconnect nodes themselves."""
+        if not 'Value' in node.interface.items_tree:
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
+            node.interface.remove(node.interface.items_tree['Value'])
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+
+        if not 'Image' in node.interface.items_tree:
+            node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
 
         node.interface.items_tree['Value'].min_value = 0 # type: ignore
         node.interface.items_tree['Value'].max_value = len(config.links) - 1 # type: ignore
 
-        if config.output_alpha: 
-            node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
+        if config.output_alpha:
+            if not 'Alpha' in node.interface.items_tree: 
+                node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
+        elif 'Alpha' in node.interface.items_tree:
+            node.interface.remove(node.interface.items_tree['Alpha'])
 
     def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         enum_item = node.beantextures_props.enum_items.add()
