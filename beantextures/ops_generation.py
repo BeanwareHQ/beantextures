@@ -468,13 +468,15 @@ class BtxsOp_GenerateNode(Operator):
     @classmethod
     def poll(cls, context):
         settings = context.scene.beantextures_settings
-        config = settings.configs[settings.active_config_idx]
+        if len(settings.configs) > 0 and settings.active_config_idx < len(settings.configs):
+            config = settings.configs[settings.active_config_idx]
 
-        if not isinstance(config.target_node_tree, bpy.types.ShaderNodeTree):
-            cls.poll_message_set("Specify a shader node group as the target!")
-        if not bool(config.target_node_tree):
-            cls.poll_message_set("Set a valid shader node group as a target first!")
-        return bool(config.target_node_tree) and isinstance(config.target_node_tree, bpy.types.ShaderNodeTree)
+            if not isinstance(config.target_node_tree, bpy.types.ShaderNodeTree):
+                cls.poll_message_set("Specify a shader node group as the target!")
+            if not bool(config.target_node_tree):
+                cls.poll_message_set("Set a valid shader node group as a target first!")
+            return bool(config.target_node_tree) and isinstance(config.target_node_tree, bpy.types.ShaderNodeTree)
+        return False
 
     def draw(self, context):
         layout = self.layout

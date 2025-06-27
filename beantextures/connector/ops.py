@@ -23,10 +23,11 @@ class BtxsOp_ConnectorOperator(Operator):
 
     @classmethod
     def poll(cls, context):
-        try:
-            return bool(context.active_bone and context.mode == 'POSE' and context.active_bone.beantextures_connector)
-        except AttributeError and IndexError:
-            return False
+        return (
+            context.mode == "POSE"
+            and hasattr(context, 'active_bone')
+            and hasattr(context.active_bone, 'beantextures_connector')
+        )
 
 class BtxsOp_NewConnectorItem(BtxsOp_ConnectorOperator):
     """Add a new connector item"""
@@ -44,8 +45,7 @@ class BtxsOp_RemoveSelectedConnectorItem(BtxsOp_ConnectorOperator):
 
     @classmethod
     def poll(cls, context):
-        connectors = context.active_bone.beantextures_connector.connectors
-        return (super().poll(context)) and (len(connectors) > 0)
+        return (super().poll(context)) and (len(context.active_bone.beantextures_connector.connectors) > 0)
 
     def execute(self, context):
         connector = context.active_bone.beantextures_connector
@@ -59,8 +59,7 @@ class BtxsOp_RemoveAllConnector(BtxsOp_ConnectorOperator):
 
     @classmethod
     def poll(cls, context):
-        connectors = context.active_bone.beantextures_connector.connectors
-        return (super().poll(context)) and (len(connectors) > 0)
+        return (super().poll(context)) and (len(context.active_bone.beantextures_connector.connectors) > 0)
 
     def execute(self, context):
         connector = context.active_bone.beantextures_connector
@@ -95,8 +94,7 @@ class BtxsOp_ReloadAllNodeNames(BtxsOp_ConnectorOperator):
 
     @classmethod
     def poll(cls, context):
-        connectors = context.active_bone.beantextures_connector.connectors
-        return (super().poll(context)) and (len(connectors) > 0)
+        return (super().poll(context)) and (len(context.active_bone.beantextures_connector.connectors) > 0)
 
     def execute(self, context):
         connector = context.active_bone.beantextures_connector
@@ -113,8 +111,7 @@ class BtxsOp_ModifyNodeSelection(BtxsOp_ConnectorOperator):
 
     @classmethod
     def poll(cls, context):
-        connectors = context.active_bone.beantextures_connector.connectors
-        return (super().poll(context)) and (len(connectors) > 0)
+        return (super().poll(context)) and (len(context.active_bone.beantextures_connector.connectors) > 0)
 
     def draw(self, context):
         layout = self.layout
