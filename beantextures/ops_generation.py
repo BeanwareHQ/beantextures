@@ -21,6 +21,7 @@ class BtxsNodeTreeBuilder:
 
         node = self.init_node_tree(config)
         self.add_io_sockets(config, node)
+        self.delete_redundant_sockets(node)
         group_in, group_out = self.add_io_nodes(node)
         rerouter = self.add_maths_rerouter(node, group_in)
 
@@ -108,6 +109,12 @@ class BtxsNodeTreeBuilder:
                 node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
         elif 'Alpha' in node.interface.items_tree:
             node.interface.remove(node.interface.items_tree['Alpha'])
+
+    def delete_redundant_sockets(self, node: NodeTree):
+        """Delete input sockets other than the important ones, as this can be problematic with node re-generation."""
+        for i in node.interface.items_tree:
+            if not(i.name == 'Value' or i.name == 'Image' or i.name == 'Alpha'): # type: ignore
+                node.interface.remove(i)
 
     def add_io_nodes(self, node: NodeTree) -> tuple[NodeGroupInput, NodeGroupOutput]:
         """Add the Group Input and Group Output nodes to the node tree."""
