@@ -8,6 +8,13 @@ bl_info = {
     "doc_url": "https://github.com/BeanwareHQ/beantextures/wiki",
     "tracker_url": "https://github.com/BeanwareHQ/beantextures/issues",
     "category": "Animation",
+    "support": "COMMUNITY",
+    "extension": {
+        "id": "beantextures",
+        "type": "add-on",
+        "version": "1.0.1",
+        "schema_version": 1,
+    }
 }
 
 from importlib import reload
