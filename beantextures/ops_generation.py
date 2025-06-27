@@ -1,8 +1,8 @@
 """Operators used to generate node groups."""
 import bpy
 from bpy.types import Image, Operator, NodeTree, NodeGroupInput, NodeGroupOutput, NodeReroute, ShaderNodeMath, ShaderNodeTexImage, ShaderNodeMix
-from beantextures.props_settings import Btxs_ConfigEntry, Btxs_LinkItem
-from beantextures.ui_node_generator import check_warnings_int, check_warnings_enum, check_warnings_float, check_warnings_int_simple
+from .props_settings import Btxs_ConfigEntry, Btxs_LinkItem
+from .ui_node_generator import check_warnings_int, check_warnings_enum, check_warnings_float, check_warnings_int_simple
 
 class BtxsNodeTreeBuilder:
     """Base class for node tree builder. Link type-specific builders should derive this class and override some of the methods here as needed."""

@@ -1,9 +1,9 @@
 """User interface for the connector."""
 import bpy
 from bpy.types import UIList
-from beantextures.connector.icon_picker import ICONS, BtxsOp_IV_OT_icons_set
-from beantextures.connector.ops import BtxsOp_ModifyNodeSelection, BtxsOp_ReloadAllNodeNames, BtxsOp_ReloadNodeNames
-from beantextures.connector.props import update_valid_nodes_list
+from .icon_picker import ICONS, BtxsOp_IV_OT_icons_set
+from .ops import BtxsOp_ModifyNodeSelection, BtxsOp_ReloadAllNodeNames, BtxsOp_ReloadNodeNames
+from .props import update_valid_nodes_list
 
 class BEANTEXTURES_UL_ConnectorItemsListRenderer(UIList):
     """

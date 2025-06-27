@@ -1,8 +1,8 @@
 """User interface for the node generator."""
 import bpy
 from bpy.types import Panel, UIList
-from beantextures.ops_settings import BtxsOp_AutoImportImages, BtxsOp_ClearLinks, BtxsOp_NewNodeGroup, BtxsOp_InitializeEnum, BtxsOp_OpenImage, BtxsOp_NewLink, BtxsOp_RemoveLink, BtxsOp_RemoveAllConfigs
-from beantextures.props_settings import Btxs_LinkItem, Btxs_ConfigEntry
+from .ops_settings import BtxsOp_AutoImportImages, BtxsOp_ClearLinks, BtxsOp_NewNodeGroup, BtxsOp_InitializeEnum, BtxsOp_OpenImage, BtxsOp_NewLink, BtxsOp_RemoveLink, BtxsOp_RemoveAllConfigs
+from .props_settings import Btxs_LinkItem, Btxs_ConfigEntry
 
 # Helper functions
 

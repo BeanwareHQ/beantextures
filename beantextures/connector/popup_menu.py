@@ -1,7 +1,7 @@
 """Definition of popup menus used to display the `Value` input of a Beantextures node."""
 import bpy
 from bpy.types import UILayout
-from beantextures.connector.props import Btxs_ConnectorInstance, update_valid_nodes_list
+from .props import Btxs_ConnectorInstance, update_valid_nodes_list
 
 def list_draw(self, context, layout: UILayout, label: bool = False):
     layout = layout

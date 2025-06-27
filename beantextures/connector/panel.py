@@ -1,6 +1,6 @@
 """View3D panel definition."""
 import bpy
-from beantextures.connector.popup_menu import list_draw
+from .popup_menu import list_draw
 
 class BeantexturesView3DPanel(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'

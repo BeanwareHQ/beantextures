@@ -3,7 +3,7 @@
 import bpy
 from bpy.types import Operator
 from bpy_extras import image_utils
-from beantextures.props_settings import Btxs_LinkItem, Btxs_ConfigEntry
+from .props_settings import Btxs_LinkItem, Btxs_ConfigEntry
 
 def add_new_config(context, name: str):
     settings = context.scene.beantextures_settings

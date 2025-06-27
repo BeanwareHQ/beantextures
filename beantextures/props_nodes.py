@@ -1,7 +1,7 @@
 """Custom attributes for Blender node and node tree classes."""
 
 import bpy
-from beantextures.props_settings import beantextures_link_type
+from .props_settings import beantextures_link_type
 
 def generate_linking_enum_items(self: bpy.types.ShaderNodeGroup, context):
     """Used by node group instances. This function returns a list of enum items based on the respecting node tree's (not the instance itself!) `enum_items` property."""

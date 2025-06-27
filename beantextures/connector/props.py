@@ -1,6 +1,6 @@
 """Custom properties for Beantexture's connector."""
 import bpy
-from beantextures.connector.icon_picker import ICONS
+from .icon_picker import ICONS
 
 icons_enum: list[tuple[str, str, str, int]] = [
         (icon, icon.title(), icon.title(), i) for i, icon in enumerate(ICONS)
