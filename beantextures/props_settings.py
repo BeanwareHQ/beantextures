@@ -51,3 +51,4 @@ def unregister():
     bpy.utils.unregister_class(Btxs_LinkItem)
     bpy.utils.unregister_class(Btxs_ConfigEntry)
     bpy.utils.unregister_class(Btxs_GlobalSettings)
+    del(bpy.types.Scene.beantextures_settings)
