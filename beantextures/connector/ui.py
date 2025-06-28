@@ -10,29 +10,24 @@ class BEANTEXTURES_UL_ConnectorItemsListRenderer(UIList):
     Renderer for a Beantextures config for the template_list widget.
     """
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            if item:
-                # TODO: make icons across items modifiable instead of only the active one.
-                if item == data.connectors[data.active_connector_idx]:
-                    layout.operator(BtxsOp_IV_OT_icons_set.bl_idname, text="", icon=item.icon, emboss=True)
-                else:
-                    layout.label(text="", icon=item.icon)
-
-                layout.prop(item, "name", text="", emboss=False)
-
-                if not item.node_is_valid:
-                    layout.label(text="", icon='ERROR')
-
-                if item.show:
-                    layout.prop(item, "show", text="", emboss=False, icon='HIDE_OFF')
-                else:
-                    layout.prop(item, "show", text="", emboss=False, icon='HIDE_ON')
+        if item:
+            # TODO: make icons across items modifiable instead of only the active one.
+            if item == data.connectors[data.active_connector_idx]:
+                layout.operator(BtxsOp_IV_OT_icons_set.bl_idname, text="", icon=item.icon, emboss=True)
             else:
-                layout.label(text="", translate=False, icon_value=icon, icon=item.icon)
+                layout.label(text="", icon=item.icon)
 
-        elif self.layout_type == 'GRID':
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon_value=icon)
+            layout.prop(item, "name", text="", emboss=False)
+
+            if not item.node_is_valid:
+                layout.label(text="", icon='ERROR')
+
+            if item.show:
+                layout.prop(item, "show", text="", emboss=False, icon='HIDE_OFF')
+            else:
+                layout.prop(item, "show", text="", emboss=False, icon='HIDE_ON')
+        else:
+            layout.label(text="", translate=False, icon_value=icon, icon=item.icon)
 
 class Btxs_ConnectorPanel(bpy.types.Panel):
     bl_space_type = 'PROPERTIES'

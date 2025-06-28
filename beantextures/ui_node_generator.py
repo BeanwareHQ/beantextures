@@ -131,15 +131,10 @@ class BEANTEXTURES_UL_ConfigsListRenderer(UIList):
     Renderer for a Beantextures config for the template_list widget.
     """
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            if item:
-                layout.prop(item, "name", text="", emboss=False, icon_value=icon, icon='TOOL_SETTINGS')
-            else:
-                layout.label(text="", translate=False, icon_value=icon, icon='TOOL_SETTINGS')
-
-        elif self.layout_type == 'GRID':
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon_value=icon)
+        if item:
+            layout.prop(item, "name", text="", emboss=False, icon_value=icon, icon='TOOL_SETTINGS')
+        else:
+            layout.label(text="", translate=False, icon_value=icon, icon='TOOL_SETTINGS')
 
 class ConfigsPanel(BeantexturesNodePanel):
     bl_idname = "BEANTEXTURES_PT_configs"
@@ -200,15 +195,10 @@ class BEANTEXTURES_UL_LinksListRenderer(UIList):
     Renderer for a Beantextures link entry for the template_list widget.
     """
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            if item:
-                layout.prop(item, "name", text="", emboss=False, icon_value=icon, icon='LINKED')
-            else:
-                layout.label(text="", translate=False, icon_value=icon, icon='LINKED')
-
-        elif self.layout_type == 'GRID':
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon_value=icon)
+        if item:
+            layout.prop(item, "name", text="", emboss=False, icon_value=icon, icon='LINKED')
+        else:
+            layout.label(text="", translate=False, icon_value=icon, icon='LINKED')
 
 class LinksPanel(BeantexturesNodePanel):
     bl_idname = "BEANTEXTURES_PT_links"
