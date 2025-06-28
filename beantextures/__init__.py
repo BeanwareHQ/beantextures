@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Beantextures",
     "author": "Cikitta Tjok (daringcuteseal)",
-    "version": (1, 0, 1, 250626),
+    "version": (1, 0, 2, 250628),
     "blender": (4, 0, 0),
     "location": "Node editor sidebar and bone properties",
     "description": "Enhance image texture-based animation workflow.",
