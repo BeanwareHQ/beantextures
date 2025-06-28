@@ -168,7 +168,14 @@ class BtxsOp_RemoveLink(Operator):
 
     @classmethod
     def poll(cls, context):
-        return True
+        if len(context.scene.beantextures_settings.configs) > 0:
+            settings = context.scene.beantextures_settings
+            config_idx = settings.active_config_idx
+            config = settings.configs[config_idx]
+
+            if config.active_link_idx < len(config.links):
+                return True
+        return False
 
     def execute(self, context):
         settings = context.scene.beantextures_settings
@@ -242,7 +249,14 @@ class BtxsOp_ClearLinks(Operator):
 
     @classmethod
     def poll(cls, context):
-        return True
+        if len(context.scene.beantextures_settings.configs) > 0:
+            settings = context.scene.beantextures_settings
+            config_idx = settings.active_config_idx
+            config = settings.configs[config_idx]
+
+            if config.active_link_idx < len(config.links):
+                return True
+        return False
 
     def execute(self, context):
         settings = context.scene.beantextures_settings
