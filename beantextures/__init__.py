@@ -12,7 +12,7 @@ bl_info = {
     "extension": {
         "id": "beantextures",
         "type": "add-on",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "schema_version": 1,
     }
 }
