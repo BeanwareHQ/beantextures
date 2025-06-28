@@ -298,6 +298,7 @@ class BtxsNodeTreeBuilder:
     def setup_node_tree_attributes(self, config, node):
         node.interface.items_tree['Value'].default_value = config.int_min # type: ignore
         node.interface.items_tree['Value'].subtype = 'FACTOR'
+        node.color_tag = 'TEXTURE'
 
 class IntSimpleNodeTreeBuilder(BtxsNodeTreeBuilder):
     def __init__(self, config: Btxs_ConfigEntry):
