@@ -16,6 +16,8 @@
 
 </div>
 
+# Great News!
+Beantexture is now [available at the official extensions marketplace](https://extensions.blender.org/add-ons/beantextures/). Simply open Blender and search for it to get started!
 
 # Overview
 
