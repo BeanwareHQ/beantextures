@@ -173,7 +173,7 @@ class BtxsOp_RemoveLink(Operator):
             config_idx = settings.active_config_idx
             config = settings.configs[config_idx]
 
-            if config.active_link_idx < len(config.links):
+            if len(config.links) > 0 and config.active_link_idx < len(config.links):
                 return True
         return False
 
@@ -254,7 +254,7 @@ class BtxsOp_ClearLinks(Operator):
             config_idx = settings.active_config_idx
             config = settings.configs[config_idx]
 
-            if config.active_link_idx < len(config.links):
+            if len(config.links) > 0 and config.active_link_idx < len(config.links):
                 return True
         return False
 
