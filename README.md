@@ -69,6 +69,9 @@ At least that's it for the node group generator. But whether the node properties
 
 </details>
 
+# Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 
 # Thanks
 
