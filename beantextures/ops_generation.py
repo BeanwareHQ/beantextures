@@ -23,6 +23,13 @@ class BtxsNodeTreeBuilder:
         self.add_io_sockets(config, node)
         self.delete_redundant_sockets(node)
         group_in, group_out = self.add_io_nodes(node)
+        # --- ADD: Expose a shared Transform Vector input and connect it to all ImageTexture nodes ---
+        if "Transform Vector" not in node.interface.items_tree:
+            node.interface.new_socket("Transform Vector", in_out='INPUT', socket_type='NodeSocketVector')
+        
+        # Keep a reference to the group input node for linking later
+        self.group_in = group_in
+
         rerouter = self.add_maths_rerouter(node, group_in)
 
         # Loop through all links
@@ -49,7 +56,10 @@ class BtxsNodeTreeBuilder:
             else:
                 img_node, self.prev_mix_inputs_loc = self.LINKLOOP_add_img(link, node, self.prev_mix_inputs_loc)
                 self.LINKLOOP_connect_image_to_mix_node(node, img_node, curr_mix_color_node)
-
+                # Connect the exposed Transform Vector to the Image Texture's vector input
+                if self.group_in and "Transform Vector" in self.group_in.outputs:
+                    node.links.new(self.group_in.outputs["Vector"], img_node.inputs["Vector"])
+                
                 if config.output_alpha:
                     # HACK: ↓ possibly unbound, but is guaranteed to be set if config.output_alpha is set to True
                     self.LINKLOOP_connect_image_alpha_to_mix_node(node, img_node, curr_mix_alpha_node) 
@@ -298,7 +308,6 @@ class BtxsNodeTreeBuilder:
     def setup_node_tree_attributes(self, config, node):
         node.interface.items_tree['Value'].default_value = config.int_min # type: ignore
         node.interface.items_tree['Value'].subtype = 'FACTOR'
-        node.color_tag = 'TEXTURE'
 
 class IntSimpleNodeTreeBuilder(BtxsNodeTreeBuilder):
     def __init__(self, config: Btxs_ConfigEntry):
