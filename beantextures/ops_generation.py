@@ -24,8 +24,8 @@ class BtxsNodeTreeBuilder:
         self.delete_redundant_sockets(node)
         group_in, group_out = self.add_io_nodes(node)
         # --- ADD: Expose a shared Transform Vector input and connect it to all ImageTexture nodes ---
-        if "Transform Vector" not in node.interface.items_tree:
-            node.interface.new_socket("Transform Vector", in_out='INPUT', socket_type='NodeSocketVector')
+        if "Vector" not in node.interface.items_tree:
+            node.interface.new_socket("Vector", in_out='INPUT', socket_type='NodeSocketVector')
         
         # Keep a reference to the group input node for linking later
         self.group_in = group_in
@@ -57,7 +57,7 @@ class BtxsNodeTreeBuilder:
                 img_node, self.prev_mix_inputs_loc = self.LINKLOOP_add_img(link, node, self.prev_mix_inputs_loc)
                 self.LINKLOOP_connect_image_to_mix_node(node, img_node, curr_mix_color_node)
                 # Connect the exposed Transform Vector to the Image Texture's vector input
-                if self.group_in and "Transform Vector" in self.group_in.outputs:
+                if self.group_in and "Vector" in self.group_in.outputs:
                     node.links.new(self.group_in.outputs["Vector"], img_node.inputs["Vector"])
                 
                 if config.output_alpha:
