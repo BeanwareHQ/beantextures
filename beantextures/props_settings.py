@@ -46,6 +46,7 @@ class Btxs_ConfigEntry(bpy.types.PropertyGroup):
     linking_type: bpy.props.EnumProperty(items=beantextures_link_type, name="Linking Type", description="Approach to link values to images")
     target_node_tree: bpy.props.PointerProperty(type=bpy.types.NodeTree, name="Target Node Tree", description="Node tree to be configured")
     output_alpha: bpy.props.BoolProperty(default=False, name="Output Alpha", description="Whether or not the generated node should output alpha of the active image")
+    input_vector: bpy.props.BoolProperty(default=False, name="Input Vector", description="Whether or not the generated node should have vector input (shared for all image textures)")
     active_link_idx: bpy.props.IntProperty(name="Index of Active Link")
     links: bpy.props.CollectionProperty(type=Btxs_LinkItem, name="Configured Links", description="Collection of defined value-image links")
 

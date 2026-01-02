@@ -54,6 +54,9 @@ class BtxsNodeTreeBuilder:
                     # HACK: ↓ possibly unbound, but is guaranteed to be set if config.output_alpha is set to True
                     self.LINKLOOP_connect_image_alpha_to_mix_node(node, img_node, curr_mix_alpha_node) 
 
+                if config.input_vector:
+                    self.LINKLOOP_connect_vector_input_to_image_node(node, group_in, img_node)
+
             if link == config.links[0]:
                 if config.fallback_img is None:
                     self.LINKLOOP_set_falback_color(curr_mix_color_node)
@@ -95,17 +98,8 @@ class BtxsNodeTreeBuilder:
 
     def add_io_sockets(self, config, node: NodeTree):
         """Add the base input and output sockets for the node tree. Only adds the sockets when they don't exist already, so that the user doesn't have to reconnect nodes themselves."""
-        if not 'Value' in node.interface.items_tree:
-            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
-            node.interface.remove(node.interface.items_tree['Value'])
-            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-
         if not 'Image' in node.interface.items_tree:
             node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
-
-        node.interface.items_tree['Value'].min_value = config.int_min # type: ignore
-        node.interface.items_tree['Value'].max_value = config.int_max # type: ignore
 
         if config.output_alpha:
             if not 'Alpha' in node.interface.items_tree: 
@@ -113,10 +107,26 @@ class BtxsNodeTreeBuilder:
         elif 'Alpha' in node.interface.items_tree:
             node.interface.remove(node.interface.items_tree['Alpha'])
 
+        if config.input_vector:
+            if not 'Vector' in node.interface.items_tree: 
+                node.interface.new_socket("Vector", in_out='INPUT', socket_type='NodeSocketVector')
+        elif 'Vector' in node.interface.items_tree:
+            node.interface.remove(node.interface.items_tree['Vector'])
+
+        if not 'Value' in node.interface.items_tree:
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
+            node.interface.remove(node.interface.items_tree['Value'])
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+
+        node.interface.items_tree['Value'].min_value = config.int_min # type: ignore
+        node.interface.items_tree['Value'].max_value = config.int_max # type: ignore
+
+
     def delete_redundant_sockets(self, node: NodeTree):
         """Delete input sockets other than the important ones, as this can be problematic with node re-generation."""
         for i in node.interface.items_tree:
-            if not(i.name == 'Value' or i.name == 'Image' or i.name == 'Alpha'): # type: ignore
+            if not(i.name == 'Value' or i.name == 'Image' or i.name == 'Alpha' or i.name == 'Vector'): # type: ignore
                 node.interface.remove(i)
 
     def add_io_nodes(self, node: NodeTree) -> tuple[NodeGroupInput, NodeGroupOutput]:
@@ -259,6 +269,12 @@ class BtxsNodeTreeBuilder:
         except AttributeError:
             return
 
+    def LINKLOOP_connect_vector_input_to_image_node(self, node: NodeTree, group_in: NodeGroupInput, node_to_connect: ShaderNodeTexImage):
+        try:
+            node.links.new(group_in.outputs['Vector'], node_to_connect.inputs['Vector'])
+        except AttributeError:
+            return
+
     def LINKLOOP_set_fallback_image(self, node: NodeTree, fallback_img: Image, color_mix_node: ShaderNodeMix) -> ShaderNodeTexImage:
         """(Only for index 0 of links) set fallback image"""
         # ShaderNodeTexImage is a subclass of Node
@@ -352,23 +368,30 @@ class FloatNodeTreeBuilder(BtxsNodeTreeBuilder):
 
     def add_io_sockets(self, config, node: NodeTree):
         """Add the base input and output sockets for the node tree. Only adds the sockets when they don't exist already, so that the user doesn't have to reconnect nodes themselves."""
-        if not 'Value' in node.interface.items_tree:
-            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
-        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketFloat):
-            node.interface.remove(node.interface.items_tree['Value'])
-            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
-
         if not 'Image' in node.interface.items_tree:
             node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
-
-        node.interface.items_tree['Value'].min_value = config.float_min # type: ignore
-        node.interface.items_tree['Value'].max_value = config.float_max # type: ignore
 
         if config.output_alpha:
             if not 'Alpha' in node.interface.items_tree: 
                 node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
         elif 'Alpha' in node.interface.items_tree:
             node.interface.remove(node.interface.items_tree['Alpha'])
+
+        if config.input_vector:
+            if not 'Vector' in node.interface.items_tree: 
+                node.interface.new_socket("Vector", in_out='INPUT', socket_type='NodeSocketVector')
+        elif 'Vector' in node.interface.items_tree:
+            node.interface.remove(node.interface.items_tree['Vector'])
+
+        if not 'Value' in node.interface.items_tree:
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketFloat):
+            node.interface.remove(node.interface.items_tree['Value'])
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
+
+        node.interface.items_tree['Value'].min_value = config.float_min # type: ignore
+        node.interface.items_tree['Value'].max_value = config.float_max # type: ignore
+
 
     def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         # ShaderNodeMath is a subclass of Node
@@ -417,23 +440,29 @@ class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
 
     def add_io_sockets(self, config, node: NodeTree):
         """Add the base input and output sockets for the node tree. Only adds the sockets when they don't exist already, so that the user doesn't have to reconnect nodes themselves."""
-        if not 'Value' in node.interface.items_tree:
-            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
-            node.interface.remove(node.interface.items_tree['Value'])
-            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-
         if not 'Image' in node.interface.items_tree:
             node.interface.new_socket("Image", in_out='OUTPUT', socket_type='NodeSocketColor')
-
-        node.interface.items_tree['Value'].min_value = 0 # type: ignore
-        node.interface.items_tree['Value'].max_value = len(config.links) - 1 # type: ignore
 
         if config.output_alpha:
             if not 'Alpha' in node.interface.items_tree: 
                 node.interface.new_socket("Alpha", in_out='OUTPUT', socket_type='NodeSocketFloat')
         elif 'Alpha' in node.interface.items_tree:
             node.interface.remove(node.interface.items_tree['Alpha'])
+
+        if config.input_vector:
+            if not 'Vector' in node.interface.items_tree: 
+                node.interface.new_socket("Vector", in_out='INPUT', socket_type='NodeSocketVector')
+        elif 'Vector' in node.interface.items_tree:
+            node.interface.remove(node.interface.items_tree['Vector'])
+
+        if not 'Value' in node.interface.items_tree:
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
+            node.interface.remove(node.interface.items_tree['Value'])
+            node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
+
+        node.interface.items_tree['Value'].min_value = 0 # type: ignore
+        node.interface.items_tree['Value'].max_value = len(config.links) - 1 # type: ignore
 
     def LINKLOOP_add_math_nodes(self, link: Btxs_LinkItem, node: NodeTree, maths_reroute_node: NodeReroute, prev_mix_inputs_loc: tuple[int, int]) -> tuple[ShaderNodeMath, ShaderNodeMath, ShaderNodeMath, tuple[int, int]]:
         enum_item = node.beantextures_props.enum_items.add()

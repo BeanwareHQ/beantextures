@@ -164,6 +164,7 @@ class ConfigsPanel(BeantexturesNodePanel):
             col.prop(item, "target_node_tree", text="Target Node Group")
             col.prop(item, "fallback_img", text="Fallback Image")
             col.prop(item, "output_alpha", text="Output Alpha")
+            col.prop(item, "input_vector", text="Input Vector")
 
             match item.linking_type:
                 case 'INT_SIMPLE':
