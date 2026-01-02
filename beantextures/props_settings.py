@@ -9,6 +9,24 @@ beantextures_link_type: list[tuple[str, str, str, int]] = [
         ('ENUM', "Enum", "Enum linking", 3),
 ]
 
+def get_builtin_image_texture_prop_enum_items(property_name: str) -> list[tuple[str, str, str, int]]:
+    """Get the official image texture node's enum for given property name."""
+    items = bpy.types.ShaderNodeTexImage.bl_rna.properties[property_name].enum_items #type: ignore
+    return [(i.identifier, i.name, i.description, n) for n, i in enumerate(items)]
+
+def get_builtin_image_texture_prop_name(property_name: str) -> str:
+    """Get the official image texture node's (human readable) property name."""
+    return bpy.types.ShaderNodeTexImage.bl_rna.properties[property_name].name
+
+def get_builtin_image_texture_prop_description(property_name: str) -> str:
+    """Get the official image texture node's (human readable) property description."""
+    return bpy.types.ShaderNodeTexImage.bl_rna.properties[property_name].description
+
+class Btxs_LinkItem_ImageProps(bpy.types.PropertyGroup):
+    interpolation: bpy.props.EnumProperty(items=get_builtin_image_texture_prop_enum_items("interpolation"), name=get_builtin_image_texture_prop_name("interpolation"), description=get_builtin_image_texture_prop_description("interpolation"))
+    projection: bpy.props.EnumProperty(items=get_builtin_image_texture_prop_enum_items("projection"), name=get_builtin_image_texture_prop_name("projection"), description=get_builtin_image_texture_prop_description("projection"))
+    extension: bpy.props.EnumProperty(items=get_builtin_image_texture_prop_enum_items("extension"), name=get_builtin_image_texture_prop_name("extension"), description=get_builtin_image_texture_prop_description("extension"))
+
 class Btxs_LinkItem(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Link Name", description="Name of a Beantextures image link")
     img: bpy.props.PointerProperty(type=bpy.types.Image, name="Linked Image")
@@ -19,6 +37,8 @@ class Btxs_LinkItem(bpy.types.PropertyGroup):
 
     float_lt: bpy.props.FloatProperty(name="When Float is Less Than")
     float_gt: bpy.props.FloatProperty(name="When Float is Greater Than")
+
+    image_node_properties: bpy.props.PointerProperty(type=Btxs_LinkItem_ImageProps, name="Image Node Properties", description="Properties to assign to image nodes")
 
 class Btxs_ConfigEntry(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Config Name", description="Name of Beantextures configuration entry")
@@ -42,12 +62,14 @@ class Btxs_GlobalSettings(bpy.types.PropertyGroup):
     #link_err_msg: bpy.props.Str
 
 def register():
+    bpy.utils.register_class(Btxs_LinkItem_ImageProps)
     bpy.utils.register_class(Btxs_LinkItem)
     bpy.utils.register_class(Btxs_ConfigEntry)
     bpy.utils.register_class(Btxs_GlobalSettings)
     bpy.types.Scene.beantextures_settings = bpy.props.PointerProperty(type=Btxs_GlobalSettings, name="Per-Scene Beantextures Settings", description="Beantextures properties for node generation settings")
 
 def unregister():
+    bpy.utils.unregister_class(Btxs_LinkItem_ImageProps)
     bpy.utils.unregister_class(Btxs_LinkItem)
     bpy.utils.unregister_class(Btxs_ConfigEntry)
     bpy.utils.unregister_class(Btxs_GlobalSettings)

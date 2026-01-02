@@ -3,7 +3,7 @@
 import bpy
 from bpy.types import Operator
 from bpy_extras import image_utils
-from .props_settings import Btxs_LinkItem, Btxs_ConfigEntry
+from .props_settings import Btxs_LinkItem, Btxs_ConfigEntry, get_builtin_image_texture_prop_description, get_builtin_image_texture_prop_enum_items, get_builtin_image_texture_prop_name
 
 def add_new_config(context, name: str):
     settings = context.scene.beantextures_settings
@@ -56,12 +56,15 @@ def remove_link(context, idx: int):
 
     config.links.remove(idx)
 
-def auto_import_images(context, directory: bpy.types.StringProperty, files: bpy.types.CollectionProperty, prefix: bpy.types.StringProperty, suffix: bpy.types.StringProperty):
+def auto_import_images(context, directory: bpy.types.StringProperty, files: bpy.types.CollectionProperty, prefix: bpy.types.StringProperty, suffix: bpy.types.StringProperty, interpolation: str, projection: str, extension: str):
     for file_name in sorted(files.keys()):
         if len(file_name) > 0:
             link = add_new_link(context)
             link.img = image_utils.load_image(directory + file_name)
             link.name = str(prefix) + bpy.path.display_name_from_filepath(file_name) + str(suffix)
+            link.image_node_properties.interpolation = interpolation
+            link.image_node_properties.projection = projection
+            link.image_node_properties.extension = extension
 
 def import_image(link: Btxs_LinkItem, directory: bpy.types.StringProperty, file: bpy.types.OperatorFileListElement):
     link.img = image_utils.load_image(directory + file.name) # type: ignore
@@ -199,12 +202,16 @@ class BtxsOp_AutoImportImages(Operator):
     name_prefix: bpy.props.StringProperty(name="Naming Prefix", description="Extra prefix which will be added to relation names")
     name_suffix: bpy.props.StringProperty(name="Naming Suffix", description="Extra suffix which will be added to relation names")
 
+    interpolation: bpy.props.EnumProperty(items=get_builtin_image_texture_prop_enum_items("interpolation"), name=get_builtin_image_texture_prop_name("interpolation"), description=get_builtin_image_texture_prop_description("interpolation"))
+    projection: bpy.props.EnumProperty(items=get_builtin_image_texture_prop_enum_items("projection"), name=get_builtin_image_texture_prop_name("projection"), description=get_builtin_image_texture_prop_description("projection"))
+    extension: bpy.props.EnumProperty(items=get_builtin_image_texture_prop_enum_items("extension"), name=get_builtin_image_texture_prop_name("extension"), description=get_builtin_image_texture_prop_description("extension"))
+
     @classmethod
     def poll(cls, context):
         return True
 
     def execute(self, context):
-        auto_import_images(context, self.directory, self.files, self.name_prefix, self.name_suffix)
+        auto_import_images(context, self.directory, self.files, self.name_prefix, self.name_suffix, self.interpolation, self.projection, self.extension)
 
         return {'FINISHED'}
 
