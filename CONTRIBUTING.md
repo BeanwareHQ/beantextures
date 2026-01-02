@@ -11,6 +11,10 @@ Then, if you use *nix, simply run the `build.sh` executable from this repo to ge
 blender --command extension build --source-dir beantextures --output-dir .
 ```
 
+Alternatively, to make and test changes quickly, you can symbolic link (or shortcut) the `beantextures` directory directly to Blender's extensions folder. For example:
+```
+ln -s ~/path/to/beantextures-git ~/.config/blender/5.0/extensions/user_default/beantextures
+```
 
 
 
