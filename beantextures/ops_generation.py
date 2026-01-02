@@ -188,6 +188,9 @@ class BtxsNodeTreeBuilder:
         img_node.name = "img_" + link.name
         img_node.location = (prev_mix_inputs_loc[0], prev_mix_inputs_loc[1] - 360)
         img_node.hide = True
+        img_node.interpolation = link.image_node_properties.interpolation
+        img_node.projection = link.image_node_properties.projection
+        img_node.extension = link.image_node_properties.extension
         return (img_node, prev_mix_inputs_loc)
 
     def LINKLOOP_add_color_input_socket(self, link: Btxs_LinkItem, node: NodeTree) -> None:

@@ -270,6 +270,11 @@ class LinksPanel(BeantexturesNodePanel):
             row.prop(active_link, "img", text="Image")
             row.operator(BtxsOp_OpenImage.bl_idname, text="", icon='FILE_FOLDER')
 
+            if active_link.img is not None:
+                col.prop(active_link.image_node_properties, "interpolation")
+                col.prop(active_link.image_node_properties, "projection")
+                col.prop(active_link.image_node_properties, "extension")
+
         except IndexError:
             return
 
