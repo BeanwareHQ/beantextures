@@ -5,9 +5,16 @@ from .props_settings import beantextures_link_type
 
 def generate_linking_enum_items(self: bpy.types.ShaderNodeGroup, context):
     """Used by node group instances. This function returns a list of enum items based on the respecting node tree's (not the instance itself!) `enum_items` property."""
+    # FIXME: there seems to be a known Blender issue that causes some kinds of
+    # strings like special characters to turn to garbage data (probably memory
+    # management issues). It is stated here:
+    # https://docs.blender.org/api/master/bpy.props.html#bpy.props.EnumProperty
+    # as a workaround, a global variable is used so the strings inside will
+    # never get GCed.
+    global BTXS_CACHE_GENERATE_LINKING_ENUM_ITEMS_DATA
     items = self.node_tree.beantextures_props.enum_items
-    # BUG: putting `item.name` as the description turns all the tooltips gibberish ...
-    return [(str(item.idx), item.name, "Select item", item.idx) for item in items]
+    BTXS_CACHE_GENERATE_LINKING_ENUM_ITEMS_DATA = [(str(item.idx), item.name, item.name, item.idx) for item in items]
+    return BTXS_CACHE_GENERATE_LINKING_ENUM_ITEMS_DATA
 
 class Btxs_EnumItem(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty(name="Enum item name", description="Human-readable name assigned by user")
