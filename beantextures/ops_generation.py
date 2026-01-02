@@ -78,6 +78,9 @@ class BtxsNodeTreeBuilder:
         self.adjust_final_node_locations(group_in, rerouter)
         self.setup_node_tree_attributes(config, node)
 
+        # The orange texture tag for Beantextures node group
+        node.color_tag = 'TEXTURE'
+
     def adjust_final_node_locations(self, group_in, rerouter):
         rerouter.location = (rerouter.location[0], (self.prev_mix_inputs_loc[1] - 360) // 2)
         group_in.location = (group_in.location[0], (self.prev_mix_inputs_loc[1] - 290) // 2)
@@ -298,7 +301,6 @@ class BtxsNodeTreeBuilder:
     def setup_node_tree_attributes(self, config, node):
         node.interface.items_tree['Value'].default_value = config.int_min # type: ignore
         node.interface.items_tree['Value'].subtype = 'FACTOR'
-        node.color_tag = 'TEXTURE'
 
 class IntSimpleNodeTreeBuilder(BtxsNodeTreeBuilder):
     def __init__(self, config: Btxs_ConfigEntry):
