@@ -11,6 +11,7 @@
 <p>
 <a href="https://github.com/BeanwareHQ/beantextures/wiki/Installation">Get it!</a> &bull;
 <a href="https://github.com/BeanwareHQ/beantextures/wiki">Wiki</a> &bull;
+<a href="https://github.com/BeanwareHQ/beantextures/wiki/FAQ">FAQ</a> &bull;
 <a href="https://github.com/BeanwareHQ/beantextures/wiki/Quick-Start-Guide">Quick Start</a>
 </p>
 
