@@ -261,6 +261,7 @@ class BtxsNodeTreeBuilder:
         node.interface.new_socket(link.name + "_alpha", in_out='INPUT', socket_type='NodeSocketFloat')
         node.interface.items_tree[link.name + "_alpha"].max_value = 1.0
         node.interface.items_tree[link.name + "_alpha"].min_value = 0.0
+        node.interface.items_tree[link.name + "_alpha"].default_value = 1.0
 
     def LINKLOOP_connect_alpha_input_socket(self, link: Btxs_LinkItem, node: NodeTree, group_in: NodeGroupInput, mix_node: ShaderNodeMix):
         """(Only if no image is supplied for the link) Link the alpha channel input socket to a mix node."""
