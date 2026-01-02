@@ -1,2 +1,2 @@
 #!/bin/env sh
-blender --command extension build --source-dir beantextures --output-dir .
+blender --factory-startup --command extension build --source-dir beantextures --output-dir .
