@@ -22,7 +22,6 @@ class BtxsNodeTreeBuilder:
         node = self.init_node_tree(config)
         self.add_io_sockets(config, node)
         self.delete_redundant_sockets(config, node)
-        self.sort_input_sockets(node)
         group_in, group_out = self.add_io_nodes(node)
         rerouter = self.add_maths_rerouter(node, group_in)
 
@@ -83,6 +82,7 @@ class BtxsNodeTreeBuilder:
 
         self.adjust_final_node_locations(group_in, rerouter)
         self.setup_node_tree_attributes(config, node)
+        self.sort_input_sockets(node)
 
         # The orange texture tag for Beantextures node group
         node.color_tag = 'TEXTURE'
