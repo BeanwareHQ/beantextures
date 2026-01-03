@@ -52,6 +52,13 @@ def search_for_duplicate_enum_name(context, link) -> bool:
 
 # Warning checkers
 
+def check_warnings_general(context, link: Btxs_LinkItem, config: Btxs_ConfigEntry) -> list[str]:
+    warnings: list[str] = []
+    if link.name == 'Value' or link.name == 'Vector' or link.name == 'Image' or link.name == 'Alpha':
+        warnings.append("Please choose other non-reserved link name.")
+
+    return warnings
+
 def check_warnings_int_simple(context, link: Btxs_LinkItem, config: Btxs_ConfigEntry) -> list[str]:
     warnings: list[str] = []
     if (search_result := search_for_duplicate_int_simple_link_value(context, link))[0]:

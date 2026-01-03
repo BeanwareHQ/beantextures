@@ -2,7 +2,7 @@
 import bpy
 from bpy.types import Image, Operator, NodeTree, NodeGroupInput, NodeGroupOutput, NodeReroute, ShaderNodeMath, ShaderNodeTexImage, ShaderNodeMix
 from .props_settings import Btxs_ConfigEntry, Btxs_LinkItem
-from .ui_node_generator import check_warnings_int, check_warnings_enum, check_warnings_float, check_warnings_int_simple
+from .ui_node_generator import check_warnings_general, check_warnings_int, check_warnings_enum, check_warnings_float, check_warnings_int_simple
 
 class BtxsNodeTreeBuilder:
     """Base class for node tree builder. Link type-specific builders should derive this class and override some of the methods here as needed."""
@@ -571,8 +571,12 @@ class BtxsOp_GenerateNode(Operator):
             # TODO: if more config checking is needed, consider making a separate function that
             # does something similar to check_warnings_<type>
             errors.update({'configuration': ["There is no link available."]})
+
         for link in config.links:
-            errors.update({f"link '{link.name}'": warning_checker(context, link, config)})
+            warnings = []
+            warnings.extend(check_warnings_general(context, link, config))
+            warnings.extend(warning_checker(context, link, config))
+            errors.update({f"link '{link.name}'": warnings})
 
         err_detected = False
         for err_key in errors.keys():
