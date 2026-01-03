@@ -148,10 +148,10 @@ class BtxsNodeTreeBuilder:
                 obj_to_move = node.interface.items_tree[idx_to_sort]
                 node.interface.move(obj_to_move, offset)
 
-        if node.interface.items_tree.find('Vector') != -1:
+        if not 'Vector' in node.interface.items_tree:
             node.interface.move(node.interface.items_tree['Vector'], offset)
 
-        if node.interface.items_tree.find('Value') != -1:
+        if not 'Value' in node.interface.items_tree:
             node.interface.move(node.interface.items_tree['Value'], offset)
 
     def add_io_nodes(self, node: NodeTree) -> tuple[NodeGroupInput, NodeGroupOutput]:
