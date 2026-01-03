@@ -21,7 +21,7 @@ class BtxsNodeTreeBuilder:
 
         node = self.init_node_tree(config)
         self.add_io_sockets(config, node)
-        self.delete_redundant_sockets(node)
+        self.delete_redundant_sockets(config, node)
         group_in, group_out = self.add_io_nodes(node)
         rerouter = self.add_maths_rerouter(node, group_in)
 
@@ -39,8 +39,9 @@ class BtxsNodeTreeBuilder:
             img_node: None | ShaderNodeTexImage = None
 
             if link.img is None:
-                self.LINKLOOP_add_color_input_socket(link, node) 
-                self.LINKLOOP_connect_color_input_socket(link, node, group_in, curr_mix_color_node)
+                if not link.name in node.interface.items_tree:
+                    self.LINKLOOP_add_color_input_socket(link, node) 
+                    self.LINKLOOP_connect_color_input_socket(link, node, group_in, curr_mix_color_node)
 
                 if config.output_alpha:
                     # HACK: ↓ possibly unbound, but is guaranteed to be set if config.output_alpha is set to True
@@ -123,12 +124,12 @@ class BtxsNodeTreeBuilder:
         node.interface.items_tree['Value'].max_value = config.int_max # type: ignore
 
 
-    def delete_redundant_sockets(self, node: NodeTree):
+    def delete_redundant_sockets(self, config: Btxs_ConfigEntry, node: NodeTree):
         """Delete input sockets other than the important ones, as this can be problematic with node re-generation."""
         items = [i.name for i in node.interface.items_tree]
         for i in items:
             idx_to_del = node.interface.items_tree.find(i)
-            if idx_to_del != -1 and not(i == 'Value' or i == 'Image' or i == 'Alpha' or i == 'Vector'): # type: ignore
+            if idx_to_del != -1 and not(i == 'Value' or i == 'Image' or i == 'Alpha' or i == 'Vector') and not (i in [c.name for c in config.links]): # type: ignore
                 obj_to_del = node.interface.items_tree[idx_to_del]
                 node.interface.remove(obj_to_del)
 
