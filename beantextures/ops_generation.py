@@ -131,9 +131,26 @@ class BtxsNodeTreeBuilder:
         items = [i.name for i in node.interface.items_tree]
         for i in items:
             idx_to_del = node.interface.items_tree.find(i)
-            if idx_to_del != -1 and not(i == 'Value' or i == 'Image' or i == 'Alpha' or i == 'Vector') and not (i in [*[c.name for c in config.links]]) and not (i in [c.name + "_alpha" for c in config.links]): # type: ignore
+
+            # FIXME: convoluted logic
+
+            # if valid index
+            if idx_to_del != -1:
                 obj_to_del = node.interface.items_tree[idx_to_del]
-                node.interface.remove(obj_to_del)
+
+                # if is alpha socket
+                if i in [c.name + "_alpha" for c in config.links]:
+                    # but configured to not output alpha
+                    if not config.output_alpha:
+                        node.interface.remove(obj_to_del)
+                        continue
+                    # configured to output alpha, so all good
+                    else:
+                        continue
+
+                # other cases
+                if not (idx_to_del == -1 or i == 'Value' or i == 'Image' or i == 'Alpha' or i == 'Vector' or (i in [*[c.name for c in config.links]])): # type: ignore
+                    node.interface.remove(obj_to_del)
 
     def sort_input_sockets(self, node: NodeTree):
         offset = len([i for i in node.interface.items_tree if i.in_out == 'OUTPUT'])
