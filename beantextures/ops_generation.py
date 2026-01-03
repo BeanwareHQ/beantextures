@@ -125,9 +125,12 @@ class BtxsNodeTreeBuilder:
 
     def delete_redundant_sockets(self, node: NodeTree):
         """Delete input sockets other than the important ones, as this can be problematic with node re-generation."""
-        for i in node.interface.items_tree:
-            if not(i.name == 'Value' or i.name == 'Image' or i.name == 'Alpha' or i.name == 'Vector'): # type: ignore
-                node.interface.remove(i)
+        items = [i.name for i in node.interface.items_tree]
+        for i in items:
+            idx_to_del = node.interface.items_tree.find(i)
+            if idx_to_del != -1 and not(i == 'Value' or i == 'Image' or i == 'Alpha' or i == 'Vector'): # type: ignore
+                obj_to_del = node.interface.items_tree[idx_to_del]
+                node.interface.remove(obj_to_del)
 
     def add_io_nodes(self, node: NodeTree) -> tuple[NodeGroupInput, NodeGroupOutput]:
         """Add the Group Input and Group Output nodes to the node tree."""
