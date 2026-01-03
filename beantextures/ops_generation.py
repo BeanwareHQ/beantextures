@@ -118,7 +118,7 @@ class BtxsNodeTreeBuilder:
 
         if not 'Value' in node.interface.items_tree:
             node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeTreeInterfaceSocketInt):
             node.interface.remove(node.interface.items_tree['Value'])
             node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
 
@@ -411,7 +411,7 @@ class FloatNodeTreeBuilder(BtxsNodeTreeBuilder):
 
         if not 'Value' in node.interface.items_tree:
             node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
-        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketFloat):
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeTreeInterfaceSocketFloat):
             node.interface.remove(node.interface.items_tree['Value'])
             node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketFloat')
 
@@ -483,7 +483,7 @@ class EnumNodeTreeBuilder(BtxsNodeTreeBuilder):
 
         if not 'Value' in node.interface.items_tree:
             node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
-        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeSocketInt):
+        elif not isinstance(node.interface.items_tree['Value'], bpy.types.NodeTreeInterfaceSocketInt):
             node.interface.remove(node.interface.items_tree['Value'])
             node.interface.new_socket("Value", in_out='INPUT', socket_type='NodeSocketInt')
 
