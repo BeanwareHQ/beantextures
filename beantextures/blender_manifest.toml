@@ -1,7 +1,7 @@
 schema_version = "1.0.0"
 
 id = "beantextures"
-version = "1.0.2"
+version = "1.1.0"
 name = "Beantextures"
 tagline = "Addon to help with 2D texture-based animations"
 maintainer = "Daringcuteseal@BeanwareHQ"
