@@ -22,6 +22,7 @@ class BtxsNodeTreeBuilder:
         node = self.init_node_tree(config)
         self.add_io_sockets(config, node)
         self.delete_redundant_sockets(config, node)
+        self.sort_input_sockets(node)
         group_in, group_out = self.add_io_nodes(node)
         rerouter = self.add_maths_rerouter(node, group_in)
 
@@ -41,11 +42,12 @@ class BtxsNodeTreeBuilder:
             if link.img is None:
                 if not link.name in node.interface.items_tree:
                     self.LINKLOOP_add_color_input_socket(link, node) 
-                    self.LINKLOOP_connect_color_input_socket(link, node, group_in, curr_mix_color_node)
+                self.LINKLOOP_connect_color_input_socket(link, node, group_in, curr_mix_color_node)
 
                 if config.output_alpha:
                     # HACK: ↓ possibly unbound, but is guaranteed to be set if config.output_alpha is set to True
-                    self.LINKLOOP_add_alpha_input_socket(node, link)
+                    if not link.name + "_alpha" in node.interface.items_tree:
+                        self.LINKLOOP_add_alpha_input_socket(node, link)
                     self.LINKLOOP_connect_alpha_input_socket(link, node, group_in, curr_mix_alpha_node)
             else:
                 img_node, self.prev_mix_inputs_loc = self.LINKLOOP_add_img(link, node, self.prev_mix_inputs_loc)
@@ -129,9 +131,28 @@ class BtxsNodeTreeBuilder:
         items = [i.name for i in node.interface.items_tree]
         for i in items:
             idx_to_del = node.interface.items_tree.find(i)
-            if idx_to_del != -1 and not(i == 'Value' or i == 'Image' or i == 'Alpha' or i == 'Vector') and not (i in [c.name for c in config.links]): # type: ignore
+            if idx_to_del != -1 and not(i == 'Value' or i == 'Image' or i == 'Alpha' or i == 'Vector') and not (i in [*[c.name for c in config.links]]) and not (i in [c.name + "_alpha" for c in config.links]): # type: ignore
                 obj_to_del = node.interface.items_tree[idx_to_del]
                 node.interface.remove(obj_to_del)
+
+    def sort_input_sockets(self, node: NodeTree):
+        offset = len([i for i in node.interface.items_tree if i.in_out == 'OUTPUT'])
+        to_sort = sorted([i.name for i in node.interface.items_tree if i.in_out == 'INPUT' and not(i.name == 'Value' or i.name == 'Vector')], reverse=True)
+
+        # FIXME: i have no idea why i can't just move to the target index I
+        # want. it doesn't do the trick for me, so i keep putting them to the
+        # first index available instead.
+        for socket_name in to_sort:
+            idx_to_sort = node.interface.items_tree.find(socket_name)
+            if idx_to_sort != -1:
+                obj_to_move = node.interface.items_tree[idx_to_sort]
+                node.interface.move(obj_to_move, offset)
+
+        if node.interface.items_tree.find('Vector') != -1:
+            node.interface.move(node.interface.items_tree['Vector'], offset)
+
+        if node.interface.items_tree.find('Value') != -1:
+            node.interface.move(node.interface.items_tree['Value'], offset)
 
     def add_io_nodes(self, node: NodeTree) -> tuple[NodeGroupInput, NodeGroupOutput]:
         """Add the Group Input and Group Output nodes to the node tree."""
