@@ -2,7 +2,7 @@
 # Modified by Daringcuteseal for Beantextures
 # Source of original code: https://projects.blender.org/blender/blender-addons/src/branch/main/development_icon_get.py
 # by roaoao, maintained by the Blender Foundation and is licensed under the GPL.
-# Add-on info: https://docs.blender.org/manual/en/4.1/addons/development/icon_viewer.html
+# Add-on info: https://extensions.blender.org/add-ons/icon-viewer/
 
 import bpy
 import math
