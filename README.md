@@ -77,6 +77,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 # Thanks
 
 - Original icon picker code: https://projects.blender.org/blender/blender-addons/src/branch/main/development_icon_get.py
-- [Labirhin](https://www.instagram.com/labirhin/), whose work became my main inspiration for writing this add-on.
+- [Labirhin](https://www.labirhin.art/), whose work became my main inspiration for writing this add-on.
 
 [^1]: Based on my research, the approach this add-on uses is the most future-proof and flexible one—not the absolute fastest one, though. You can read my devlog(s) for more information: https://daringcuteseal.github.io/blog/beantextures-devlog-2/
